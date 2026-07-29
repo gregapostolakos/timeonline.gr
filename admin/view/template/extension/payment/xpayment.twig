@@ -1,0 +1,307 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+      <div class="container-fluid">
+      <div class="pull-right float-right float-end">
+        <button type="button" id="btn_ocm_save" value="save" {{ dataPrefix }}toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fas fa-save"></i></button>
+        <a id="btn_ocm_quick" onclick="return false;" {{ dataPrefix }}toggle="tooltip" title="{{ button_save_continue }}" id="btn_ocm_quick" class="btn btn-info"><i class="fa fas fa-clipboard fa-window-restore"></i></a>
+        <button type="button" id="btn_ocm_cache" value="clear" name="cache" {{ dataPrefix }}toggle="tooltip" title="{{ button_cache }}" class="btn btn-danger"><i class="fa fas fa-minus-circle"></i></button>&nbsp;
+        <a href="{{ cancel }}" {{ dataPrefix }}toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default btn-light"><i class="fa fas fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+      </ul>
+      </div>
+   </div>
+   <div class="container-fluid">
+      {% if error_warning %}
+        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+          <button type="button" class="close btn-close" {{ dataPrefix }}dismiss="alert">&times;</button>
+        </div>
+      {% endif %}
+      {% if success %}
+        <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i> {{ success }}
+          <button type="button" class="close btn-close" {{ dataPrefix }}dismiss="alert">&times;</button>
+        </div>
+      {% endif %}
+      <div class="card panel panel-default">
+        <div class="panel-heading card-header">
+           <h3 class="panel-title"><i class="fa fas fa-pencil-alt"></i> {{ text_edit }}</h3>
+        </div>
+        <div class="panel-body card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-ocm" class="form-horizontal">
+            <input type="file" class="ocm-file" accept="application/json" name="file" />
+            <div class="row">
+                <div class="col-sm-3">
+                   <ul id="ocm-method-list" class="nav flex-column draggable-container">
+                     <li class="nav-item" draggable="false"><a draggable="false" href="#tab-global" class="nav-link global active" {{ dataPrefix }}toggle="tab">{{ tab_global }}</a></li>
+                      {% for no_of_tab, name in methods %}
+                        <li draggable="true" class="nav-item draggable"><a draggable="false" class="nav-link tab{{ no_of_tab }}" href="#ocm-method-{{ no_of_tab }}" rel="{{ no_of_tab }}" {{ dataPrefix }}toggle="tab">
+                      {{ name }}</a><i class="fa fas fa-arrows-alt"></i></li>
+                      {% endfor %}
+                   </ul>
+                  <button class="btn btn-success add-ocm-new" {{ dataPrefix }}toggle="tooltip" form="form-ocm" type="button"  {{ dataPrefix }}placement="bottom"  {{ dataPrefix }}original-title="{{ text_add_new_method }}"><i class="fa fa-plus"></i></button>
+                </div>
+                <div class="col-sm-9">
+                    <div id="ocm-container" class="tab-content">
+                        <div class="tab-pane active global-tab-content" id="tab-global">
+                            {{ global }}
+                        </div>
+                        {{ form_data }}
+                    </div>
+                </div>
+            </div>
+          </form>
+       </div>
+     </div>
+   </div>
+</div>
+<link rel="stylesheet" type="text/css" href="{{ ocm_base_url }}view/javascript/ocm/ocm.css?v=1.1.4">
+<style type="text/css"> 
+/*  For  OC 3.1 */
+{% if oc_4 == true %}
+h3.panel-title {
+    font-size: 15px;
+    font-weight: normal;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+{% endif %}
+.gateway-information {
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+.gateway-information .info-header {
+    background: #ddd;
+    padding: 6px;
+    font-weight: bold;
+    position: relative;
+}
+.gateway-information .info-body {
+    padding: 12px;
+}
+.gateway-import button {
+    margin-left: 5px;
+}
+.gateway-import {
+    text-align: right;
+    margin-bottom: 10px;
+}
+.hide-info {
+    display: none !important;
+}
+a.info-edit {
+    position: absolute;
+    right: 10px;
+    color: #f38633;
+    cursor: pointer;
+}
+textarea.info-input {
+    height: 150px;
+    display: none;
+}
+.info-body ol {
+    padding: 0px 20px;
+}
+.info-body ol li {
+    padding: 5px;
+}
+.info-body ol li span {
+    display: inline-block;
+    margin: 5px 0px 0px 10px;
+}
+.info-body u {
+    text-decoration: none;
+    color: #b35605;
+}
+</style>
+<script type="text/javascript">
+var _ocm = {
+    token: 'user_token={{ user_token }}',
+    name: '{{ x_name }}',
+    path: '{{ x_path }}',
+    dnd: true, 
+    oc4: '{{ oc_4 }}',
+    divider: '{{ divider }}',
+    dashboard: '{{ cancel }}'
+};
+</script>
+{% if summer_js %}
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
+{% endif %}
+{% if ckeditor_js %}
+<script type="text/javascript" src="view/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="view/javascript/ckeditor/adapters/jquery.js"></script>
+{% endif %}
+
+<script src="{{ ocm_base_url }}view/javascript/ocm/ocm.js?v=1.1.7" type="text/javascript"></script>
+<script type="text/javascript"><!--
+var ocm_tab;
+var tpl = {{ tpl }};
+var more_help = {{ more_help }};
+
+var rb_row ='<tr draggable="true" class="draggable" rel="{index}">'; 
+    rb_row += '    <td draggable="false" class="text-left"><input size="15" type="text" name="xpayment[{_type}][{index}][name]" class="form-control param-name" value="{name}" /></td>';
+    rb_row += '    <td draggable="false" class="text-left"><input size="15" type="text" name="xpayment[{_type}][{index}][value]" class="form-control param-value {class}" {attr} value="{value}" /></td>';
+    rb_row += '    <td class="text-right"><a class="btn btn-sm btn-default ocm-row-move"><i class="fa fas fa-arrows-alt"></i></a>&nbsp;<a draggable="false" class="btn btn-sm btn-danger ocm-row-remove"><i class="fa fas fa-trash fa-trash-alt"></i></a></td>';
+    rb_row += '</tr>';
+
+var rb_table = new ocm.model.table('.int_{{ dataPrefix }}param table' ,'#ocm-method-' + ocm_tab);
+rb_table.setMessage('{{ text_no_params }}');
+$(document).on('click','.add-param-row',function() {
+    var _type;
+    if ($(this).hasClass('int_data')) {
+       _type = 'int_data';
+    } else if ($(this).hasClass('additional_data')) {
+        _type = 'additional_data';
+    } else if ($(this).hasClass('header_data')) {
+        _type = 'header_data';
+    } else {
+        _type = 'callback_data';
+    }
+    var param = {
+        name: '',
+        value: ''
+    };
+    addParamRow(_type, param);
+});
+
+$(document).on('change','[name="xpayment[int_type]"]', function(e) {
+    if ($(this).val() == '') {
+        $('[name="xpayment[hash]"]', '#ocm-method-' + ocm_tab).prop('checked', false);
+    }
+    $('[name="xpayment[hash]"]', '#ocm-method-' + ocm_tab).trigger('change');
+    if ($(this).val() !== 'api' && $(this).val() !== 'fetch_redirect') {
+        $('div.int_header-param', '#ocm-method-' + ocm_tab).removeClass('ocm-visible').addClass('ocm-hide');
+    }
+    /*
+    if ($(this).val() !== 'fetch_redirect') {
+        $('div.fetch_key', '#ocm-method-' + ocm_tab).removeClass('ocm-visible').addClass('ocm-hide');
+    } */
+});
+
+function addParamRow(_type, param) {
+    var _attr = _type == 'int_data' ||  _type == 'callback_data' || _type == 'header_data' ? ' attr="param"' : ' attr="custom"';
+    var _class = 'ocm-autofill param-autofill';
+
+    rb_table.setSelector('.' + _type + '-tbody');
+    var data = {index : rb_table.next(), name: param.name, value: param.value, _type: _type, attr: _attr, class: _class};
+    var _row = ocm.util.interpolate(rb_row, data);
+    rb_table.add(_row);
+    $('input.param-autofill', '#ocm-method-' + ocm_tab).autocomplete(ocm.complete);
+}
+
+function onOcmTabSwitch() {
+    rb_table.setContext('#ocm-method-' + ocm_tab);
+}
+function onOcmTabCreated() {
+    initEditor('#ocm-method-' + ocm_tab + ' .editor textarea');
+    rb_table.setContext('#ocm-method-' + ocm_tab);
+}
+function onGwFinish(json) {
+    var fields = ['additional_data', 'information', 'information_formated', 'int_data', 'header_data', 'int_name', 'int_success', 'int_type', 'int_url', 'method_type', 'success_method_type', 'hash', 'hash_bin', 'hash_base64', 'hash_type', 'hash_str', 'hash_key', 'js_url'];
+    if (json && json.fields) {
+        var _fields = json.fields;
+        $('.info-body', '#ocm-method-' + ocm_tab).closest('.info-row').addClass('hide-info');
+        for(var i = 0; i < fields.length; i++) {
+            var key = fields[i];
+            if (typeof _fields[key] !== 'undefined') {
+                if (key == 'information_formated') {
+                    $('.info-body', '#ocm-method-' + ocm_tab).html(_fields[key]);
+                    $('.info-body', '#ocm-method-' + ocm_tab).closest('.info-row').removeClass('hide-info');
+                } else if(key == 'int_data' || key == 'additional_data' || key == 'header_data') {
+                    rb_table.setSelector('.' + key + '-tbody');
+                    rb_table.removeAll();
+                    for(var j = 0; j < _fields[key].length; j++) {
+                        addParamRow(key, _fields[key][j]);
+                    }
+                } else if (key == 'hash' || key == 'hash_bin' || key == 'hash_base64') {
+                    $('[name="xpayment[' + key + ']"]', '#ocm-method-' + ocm_tab).prop('checked', _fields[key]);
+                } else {
+                    $('[name="xpayment[' + key + ']"]', '#ocm-method-' + ocm_tab).val(_fields[key]);
+                }
+            }
+        }
+        $('[name="xpayment[int_type]"]', '#ocm-method-' + ocm_tab).trigger('change');
+    } else {
+        alert('{{ failed_import }}');
+    }
+}
+$("#ocm-container").on('click', '.ocm-import-gw', function() {
+    $('input.ocm-file:file').trigger('click');
+});
+$("#ocm-container").on('click', '.info-edit', function() {
+    $(this).closest('.gateway-information').find('.info-body').hide();
+    $(this).closest('.gateway-information').find('.info-input').show();
+});
+
+$("input.ocm-file:file").change(function () {
+    var file = $('input.ocm-file:file').get(0).files[0];
+    var fd = new FormData();
+    fd.append('file', file);
+    $('input.ocm-file:file').val('');
+    ocm.action.doAjax('importGW', fd, onGwFinish);
+});
+
+var placeholders = {{ placeholders }};
+var status_placeholers = {{ status_placeholers }};
+ocm.complete.addConfig('param', { url: getParamList, id: 'param' });
+ocm.complete.addConfig('custom', { url: getStatusList, id: 'custom' });
+
+function getStatusList(request) {
+    var filtered = [];
+    for(var i = 0; i < status_placeholers.length; i++) {
+        var name = status_placeholers[i];
+        if (request && request.indexOf('-') != -1 && name.toLowerCase().indexOf(request) != -1) {
+            filtered.push({
+                label: name,
+                value: name
+            });
+        }
+    }
+    return filtered;
+}
+function getParamList(request) {
+    var filtered = [];
+    for(var i = 0; i < placeholders.length; i++) {
+        var name = placeholders[i];
+        if (name.toLowerCase().indexOf(request) != -1) {
+            filtered.push({
+                label: name,
+                value: name
+            });
+        }
+    }
+    // Custom variable
+    $('.additional_{{ dataPrefix }}param input.param-name', '#ocm-method-' + ocm_tab).each(function(i) {
+        var name = $(this).val();
+        if (name.indexOf('{_') === -1 && name.toLowerCase().indexOf(request) != -1) {
+            filtered.push({
+                label: name,
+                value: name
+            });
+        }
+    });
+    if (filtered.length > 10) {
+        filtered = filtered.slice(0, 10);
+    }
+    return filtered;
+}
+initEditor('.editor textarea');
+{% if oc_2_1 %}
+//editor fix for OC 2.1.x
+function onGrabMethodData() {
+    $('#ocm-method-' + ocm_tab + ' .editor textarea.form-control').each(function() {
+        $(this).val($(this).code());
+    });
+}
+{% endif %}
+//--></script>
+{{ _v }}
+{{ footer }}

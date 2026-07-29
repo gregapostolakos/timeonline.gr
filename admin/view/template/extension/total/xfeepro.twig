@@ -1,0 +1,171 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+      <div class="container-fluid">
+      <div class="pull-right float-right float-end">
+        <button type="button" id="btn_ocm_save" value="save" {{ dataPrefix }}toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fas fa-save"></i></button>
+        <a id="btn_ocm_quick" onclick="return false;" {{ dataPrefix }}toggle="tooltip" title="{{ button_save_continue }}" id="btn_ocm_quick" class="btn btn-info"><i class="fa fas fa-clipboard fa-window-restore"></i></a>
+        <button type="button" id="btn_ocm_cache" value="clear" name="cache" {{ dataPrefix }}toggle="tooltip" title="{{ button_cache }}" class="btn btn-danger"><i class="fa fas fa-minus-circle"></i></button>&nbsp;
+        <a href="{{ cancel }}" {{ dataPrefix }}toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default btn-light"><i class="fa fas fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+      </ul>
+      </div>
+   </div>
+   <div class="container-fluid">
+      {% if error_warning %}
+        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+          <button type="button" class="close btn-close" {{ dataPrefix }}dismiss="alert">&times;</button>
+        </div>
+      {% endif %}
+      {% if success %}
+        <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i> {{ success }}
+          <button type="button" class="close btn-close" {{ dataPrefix }}dismiss="alert">&times;</button>
+        </div>
+      {% endif %}
+      <div class="card panel panel-default">
+        <div class="panel-heading card-header">
+           <h3 class="panel-title"><i class="fa fas fa-pencil-alt"></i> {{ text_edit }}</h3>
+        </div>
+        <div class="panel-body card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-ocm" class="form-horizontal">
+            <input type="file" class="ocm-file" accept="text/csv" name="file" />
+            <div class="row">
+                <div class="col-sm-3">
+                   <ul id="ocm-method-list" class="nav flex-column draggable-container">
+                     <li class="nav-item" draggable="false"><a draggable="false" href="#tab-global" class="nav-link global active" {{ dataPrefix }}toggle="tab">{{ tab_global }}</a></li>
+                      {% for no_of_tab, name in methods %}
+                        <li draggable="true" class="nav-item draggable"><a draggable="false" class="nav-link tab{{ no_of_tab }}" href="#ocm-method-{{ no_of_tab }}" rel="{{ no_of_tab }}" {{ dataPrefix }}toggle="tab">
+                      {{ name }}</a><i class="fa fas fa-arrows-alt"></i></li>
+                      {% endfor %}
+                   </ul>
+                  <button class="btn btn-success add-ocm-new" {{ dataPrefix }}toggle="tooltip" form="form-ocm" type="button"  {{ dataPrefix }}placement="bottom"  {{ dataPrefix }}original-title="{{ text_add_new_method }}"><i class="fa fa-plus"></i></button>
+                </div>
+                <div class="col-sm-9">
+                    <div id="ocm-container" class="tab-content">
+                        <div class="tab-pane active global-tab-content" id="tab-global">
+                            {{ global }}
+                        </div>
+                        {{ form_data }}
+                    </div>
+                </div>
+            </div>
+          </form>
+       </div>
+     </div>
+   </div>
+</div>
+<link rel="stylesheet" type="text/css" href="{{ ocm_base_url }}view/javascript/ocm/ocm.css?v=1.1.4">
+<style type="text/css"> 
+.method-tab {
+    margin-top: 20px;
+}
+.price-range {
+    float: left;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-top: 15px;
+}
+/*  For  OC 4.x */
+{% if oc_4 == true %}
+h3.panel-title {
+    font-size: 15px;
+    font-weight: normal;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+{% endif %}
+</style>
+<script type="text/javascript">
+var _ocm = {
+    token: 'user_token={{ user_token }}',
+    name: '{{ x_name }}',
+    path: '{{ x_path }}',
+    dnd: true, 
+    oc4: '{{ oc_4 }}',
+    divider: '{{ divider }}',
+    dashboard: '{{ cancel }}'
+};
+</script>
+<script src="{{ ocm_base_url }}view/javascript/ocm/ocm.js?v=1.1.7" type="text/javascript"></script>
+<script type="text/javascript"><!--
+var ocm_tab;
+var unit_row ='<tr rel="{index}">'; 
+    unit_row += '    <td class="text-left"><input size="15" type="text" name="xfeepro[ranges][{index}][start]" class="form-control" value="{start}" /></td>';
+    unit_row += '    <td class="text-left"><input size="15" type="text" name="xfeepro[ranges][{index}][end]" class="form-control" value="{end}" /></td>';
+    unit_row += '    <td class="text-left"><input size="15" type="text" name="xfeepro[ranges][{index}][cost]" class="form-control" value="{cost}" /></td>';
+    unit_row += '    <td class="text-left"><input size="6" type="text" name="xfeepro[ranges][{index}][block]" class="form-control" value="{block}" /></td>';
+    unit_row += '    <td class="text-left"><select class="form-control" name="xfeepro[ranges][{index}][partial]"><option value="0">{{ text_up }}</option><option value="2">{{ text_down }}</option> <option value="1">{{ text_fraction }}</option><</select></td>';
+    unit_row += '    <td class="text-right"><a class="btn btn-sm btn-danger ocm-row-remove">{{ text_remove }}</a></td>';
+    unit_row += '</tr>';
+
+var tpl = {{ tpl }};
+var more_help = {{ more_help }};
+
+/* callback of  CSV upload  of the ranges option */
+function onCsvFinish(json) {
+    if (json['data']) {
+         for(i=0; i < json['data'].length; i++) {
+            var data = json['data'][i];
+            data.partial = data.partial || 0;
+            data.type = data.type || 'quantity';
+            data.index = ocm.table.next();
+            var _row = ocm.util.interpolate(unit_row, data);
+            ocm.table.add(_row);
+            $('#ocm-method-'+ocm_tab).find('.ocm-range-container tr[rel="'+data.index+'"] [name*="partial"]').val(data.partial);
+            $('#ocm-method-'+ocm_tab).find('.ocm-range-container tr[rel="'+data.index+'"] [name*="type"]').val(data.type);
+        }
+    }
+}
+
+/* DOM  Event starts */
+$(document).ready(function () {
+    /* add auto complete config for method  */
+    ocm.complete.addConfig('hide', { url: getMethodList });
+    /* Load Zone by countries */
+    $("#ocm-container").on('change','[name^="xfeepro[country]"]', function(e) { 
+        var data = $(this).closest('.ocm-checkgroup-checkbox').find('input[type="checkbox"]:checked');
+        ocm.action.doAjax('fetchZone', data, function(json) {
+            var _html = '';
+            var current_method = $('#ocm-method-' + ocm_tab);
+            var active_zones = $('[name^="xfeepro[zone]"]:checked', current_method).map(function() {
+                  return $(this).val(); 
+            }).toArray();
+            for (var i = 0; i < json.length; i++) {
+                var item = json[i];
+                var checked = active_zones.indexOf(item['zone_id']) !== -1 ? 'checked' : '';
+                _html +='<label><input type="checkbox" '+checked+' name="xfeepro[zone][]" value="'+item['zone_id']+'" />&nbsp;' + item['name'] + '</label>';
+            }
+            $('[ocm-attr="zone"] .ocm-checkgroup-checkbox', current_method).html(_html);
+        });
+    });
+
+    /* Price Range Options */
+    $("#ocm-container").on('click','.add-ocm-row',function() {
+        var data = {index : ocm.table.next(), start: 0, end: 0, cost: 0, block: 0};
+        var _row = ocm.util.interpolate(unit_row, data);
+        ocm.table.add(_row);
+    });
+
+    /* CSV upload*/
+    $("#ocm-container").on('click', '.range-import-btn', function() {
+        $('input.ocm-file:file').trigger('click');
+    });
+
+    $("input.ocm-file:file").change(function () {
+        var file = $('input.ocm-file:file').get(0).files[0];
+        var fd = new FormData();
+        fd.append('file', file);
+        $('input.ocm-file:file').val('');
+        ocm.action.doAjax('importCSV', fd, onCsvFinish);
+    });
+    /* End Of Range Option */
+ });
+//--></script>
+{{ _v }}
+{{ footer }}

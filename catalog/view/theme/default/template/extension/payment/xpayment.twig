@@ -1,0 +1,115 @@
+{% if redirect %}
+<form id="xpayment_form" action="{{ redirect }}" method="{{ method_type }}">
+  {% for single in form_data %}
+     <input type="hidden" name="{{ single.name }}" value="{{ single.value }}" />
+  {% endfor %}
+</form>
+{% endif %}
+
+{% if xerror %}
+   <div class="error xpayment-error" style="color:red;">{{ xerror }}</div>
+{% endif %}
+
+{% if instruction %}
+    {% if title_status %}
+      <h2>{{ xpayment_name }}</h2>
+    {% endif %}
+    <div class="well well-sm xpayment-instruction">
+     {% if xform %}
+        <form method="post" class="xform-form" id="xpayment-xform" enctype="multipart/form-data">
+     {% endif %}
+       <p> {{ instruction }}</p>
+     {% if xform %}
+        </form>
+     {% endif %}
+    </div>
+{% endif %}
+
+{% if xerror == false %}
+    <div class="buttons">
+      <div class="pull-right">
+        <input type="button" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" />
+      </div>
+    </div>
+{% endif %}
+
+<script type="text/javascript"><!--
+{% if redirect %}
+    $('#button-confirm').bind('click', function() {
+         $("#xpayment_form").submit();
+    });
+{% else %}
+    function failedPostProcessing() {
+        /* journal checout hide loader */
+        if (window.triggerLoadingOff) {
+            triggerLoadingOff();
+        }
+        $('.journal-loading-overlay').hide();
+        $('#quick-checkout-button-confirm').button('reset');
+        $("#button-confirm").button("reset");
+        $('.so-onepagecheckout #so-checkout-confirm-button').button('reset');
+    }
+    {% if xform %}
+    if (window.xform) {
+        window.xform.warmUp();
+        window.xform.populateForm('.xpayment-instruction');
+    }
+    {% endif %}
+    $('#button-confirm').bind('click', function() {
+       var inline_data;
+       if (window._onXPaymentConfirm) {
+            var _return = _onXPaymentConfirm();
+            if (_return) {
+                failedPostProcessing();
+                return;
+            }
+        }
+        var formId = $('.xpayment-instruction').find('input[name="formId"]').val();
+        var xform_param = (window._xform && window._xform[formId]) || false;
+        if (xform_param && window.xform && !window.xform.doValidate('.xpayment-instruction')) {
+            failedPostProcessing();
+            return;
+        }
+       {% if xform == false %}
+        inline_data = $('div.xpayment-instruction :input').serialize();
+       {% endif %}
+        $.ajax({ 
+            type: 'get',
+            dataType: 'json',
+            url: '{{ action }}'+((inline_data) ? '&'+inline_data:'') +'{% if xform %}&formId={{ xform }}{% endif %}',
+
+            {% if xform %}
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: new FormData(document.querySelector("#xpayment-xform")),
+            {% endif %}
+            cache: false,
+            beforeSend: function() {
+                $('#button-confirm').button('loading');
+            },
+            complete: function() {
+                $('#button-confirm').button('reset');
+            },      
+            success: function(json) {
+               if (json.errors) {
+                    window.xform.doDisplayErrors('.xpayment-instruction', json.errors, true);
+                    failedPostProcessing();
+                } else if(json.error) {
+                    xpayment.showError(json.error);
+                    failedPostProcessing();
+                } else if (json.redirect) {
+                    location = json.redirect;
+                } else {
+                    location = '{{ continue }}';
+                }
+            }
+        });
+    });
+ {% endif %}
+//--></script>
+<style type="text/css">
+  .xpayment-instruction p {
+    white-space: pre-line;
+  }
+</style>

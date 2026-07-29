@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Καταστήματα | timeonline.gr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/oc/stores/widget.css">
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:#FCFCFA;font-family:'Jost',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.tos-page{padding:24px 16px 36px}
+@media (max-width:860px){.tos-page{padding:14px 10px 24px}}
+.tos-locator{font-family:'Jost',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+</style>
+</head>
+<body>
+<div class="tos-page">
+<div class="tos-locator">
+  <div class="tos-head">
+    <p class="tos-eyebrow">timeonline.gr</p>
+    <h2 class="tos-title">Πού θα μας βρείτε</h2>
+    <p class="tos-lead">Τα επίσημα καταστήματα-συνεργάτες όπου θα βρείτε τις συλλογές μας — <b>316 σημεία πώλησης</b> σε όλη την Ελλάδα &amp; την Κύπρο. Βρείτε το πλησιέστερο σε εσάς.</p>
+  </div>
+  <div class="tos-controls">
+    <div class="tos-searchrow">
+      <div class="tos-field grow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="tos-q" type="text" placeholder="Αναζήτηση: κατάστημα, πόλη ή διεύθυνση…" autocomplete="off">
+      </div>
+      <button class="tos-field tos-geo" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+        <span class="tos-geolabel">Η τοποθεσία μου</span>
+      </button>
+      <div class="tos-field sel"><select class="tos-region"><option value="">Όλες οι περιοχές</option></select></div>
+    </div>
+    <div class="tos-geostatus"></div>
+    <div class="tos-chips"></div>
+    <div class="tos-meta">
+      <div class="tos-count"><b class="tos-n">0</b> καταστήματα</div>
+      <div class="tos-toggle">
+        <button class="tos-tl on" data-v="list">Λίστα</button>
+        <button class="tos-tm" data-v="map">Χάρτης</button>
+      </div>
+    </div>
+  </div>
+  <div class="tos-split" data-view="list">
+    <div class="tos-list"></div>
+    <div class="tos-mapcol"><div class="tos-map"></div></div>
+  </div>
+</div>
+</div>
+<script src="/oc/stores/widget.js" charset="UTF-8"></script>
+</body>
+</html>

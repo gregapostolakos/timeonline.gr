@@ -1,0 +1,160 @@
+<?php
+// Heading
+$_['heading_title']            = 'Google Merchant Feed';
+
+// Text
+$_['text_extension']           = 'Extensions';
+$_['text_home']                = 'Home';
+$_['text_success']             = 'Success: You have modified the Google Merchant feed!';
+$_['text_edit']                = 'Edit Google Merchant Feed';
+$_['text_enabled']             = 'Enabled';
+$_['text_disabled']            = 'Disabled';
+$_['text_yes']                 = 'Yes';
+$_['text_no']                  = 'No';
+$_['text_select']              = '--- Select ---';
+$_['text_autocomplete']        = 'Search to check… (autocomplete)';
+$_['text_none']                = '--- None ---';
+$_['text_exclude_skip']        = '--- Exclude product ---';
+$_['text_default']             = 'Default';
+
+$_['text_weight_g']            = 'Grams (g)';
+$_['text_weight_kg']           = 'Kilograms (kg)';
+
+$_['text_source_option']       = 'Product Option';
+$_['text_source_attribute']    = 'Attribute';
+$_['text_source_none']         = 'None';
+
+$_['text_desc_description']    = 'Description';
+$_['text_desc_meta']           = 'Meta Description';
+
+$_['text_empty_ean']           = 'Missing EAN / barcode';
+$_['text_empty_mpn']           = 'Missing MPN';
+$_['text_empty_image']         = 'Missing image';
+$_['text_empty_manufacturer']  = 'Missing manufacturer';
+$_['text_empty_price']         = 'Zero / empty price';
+
+$_['text_percent']             = 'Percent (%)';
+$_['text_fixed']               = 'Fixed (€)';
+
+$_['text_feed_url']            = 'Your feed is available at';
+
+// Custom label sources
+$_['text_label_manufacturer']  = 'Manufacturer (brand)';
+$_['text_label_category']      = 'Category (top-level)';
+$_['text_label_category_last'] = 'Category (final / deepest)';
+$_['text_label_category_path'] = 'Category (full path)';
+$_['text_label_on_sale']       = 'On sale (sale/regular)';
+$_['text_label_price_range']   = 'Price range (bucket)';
+$_['text_label_availability']  = 'Availability';
+$_['text_label_value']         = 'Label value';
+
+// Tabs
+$_['tab_general']              = 'General';
+$_['tab_mapping']              = 'Field Mapping';
+$_['tab_availability']         = 'Availability & Stock';
+$_['tab_labels']               = 'Custom Labels';
+$_['tab_exclude']              = 'Excludes';
+$_['tab_buffer']               = 'Price Buffer';
+$_['tab_support']              = 'Support';
+
+// Support tab
+$_['copyright_title']          = 'Copyright';
+$_['copyright_body']           = 'Google Merchant Feed for OpenCart, developed by Webartstudio. This extension is licensed for use on the store it was installed on.';
+$_['text_rights']              = 'All rights reserved.';
+$_['support_title']            = 'Support';
+$_['support_body']             = 'Need help with configuration or have a question about the feed? Contact our team — we are happy to help.';
+$_['support_hours']            = 'Support hours: Mon–Fri 09:00–17:00';
+$_['support_note']             = 'Please have your store URL and the feed URL ready when contacting support.';
+$_['text_about']               = 'About';
+$_['text_version']             = 'Version';
+
+// Entry
+$_['entry_status']             = 'Status';
+$_['entry_store']              = 'Store';
+$_['entry_language']           = 'Language';
+$_['entry_customer_group']     = 'Customer Group';
+$_['entry_mask']               = 'Feed URL mask';
+$_['entry_currency']           = 'Currency';
+$_['entry_weight_unit']        = 'Weight output unit';
+$_['entry_desc_source']        = 'Description source';
+$_['entry_vat_default']        = 'Default VAT rate';
+$_['entry_strip_html']         = 'Strip HTML';
+$_['entry_shipping']           = 'Shipping cost / Country';
+$_['entry_condition']          = 'Product condition';
+$_['entry_gender']             = 'Gender';
+$_['entry_age_group']          = 'Age group';
+$_['entry_google_category']    = 'Google product category';
+
+$_['entry_mpn_field']          = 'MPN source field';
+$_['entry_ean_field']          = 'GTIN / EAN source field';
+$_['entry_variations']         = 'Per-size variants';
+$_['entry_size_source']        = 'Size source';
+$_['entry_color_source']       = 'Color source';
+$_['entry_additional_images']  = 'Additional images';
+
+$_['entry_availability_instock'] = 'Availability when in stock';
+$_['entry_availability_map']     = 'Out-of-stock availability mapping';
+$_['entry_exclude_stock']        = 'Exclude these stock statuses';
+
+$_['entry_label_sources']      = 'Source per custom label';
+$_['entry_price_buckets']      = 'Price buckets';
+$_['entry_label_rules']        = 'Override rules (take precedence over source)';
+
+$_['entry_exclude_product']      = 'Exclude products';
+$_['entry_exclude_category']     = 'Exclude categories';
+$_['entry_exclude_manufacturer'] = 'Exclude manufacturers';
+$_['entry_exclude_empty']        = 'Exclude products with';
+
+$_['entry_buffer_general']     = 'General buffer';
+$_['entry_buffer_op']          = 'Operation';
+$_['entry_buffer_val']         = 'Value';
+$_['entry_buffer_round']       = 'Round to .99';
+$_['entry_buffer_product']     = 'Per-product buffers';
+$_['entry_buffer_category']    = 'Per-category buffers';
+$_['entry_buffer_manufacturer']= 'Per-manufacturer buffers';
+
+// Column
+$_['column_stock_status']      = 'Stock status';
+$_['column_availability']      = 'Google availability';
+$_['column_name']              = 'Name';
+$_['column_operation']         = 'Operation';
+$_['column_value']             = 'Value';
+$_['column_action']            = 'Action';
+$_['column_label']             = 'Label';
+$_['column_rule_type']         = 'Condition';
+$_['column_rule_ref']          = 'Category / Manufacturer';
+$_['column_rule_num']          = 'Amount (€)';
+$_['column_rule_output']       = 'Label output';
+
+// Help
+$_['help_mask']                = 'Clean filename/path after the domain (e.g. "google.xml"). Leave empty to use the default route URL.';
+$_['help_currency']            = '3-letter currency code appended to the price (e.g. EUR → "19.99 EUR").';
+$_['help_weight_unit']         = 'Output unit for shipping_weight. Product weight is converted from its weight class.';
+$_['help_customer_group']      = 'Prices (specials/discounts) are calculated for this customer group.';
+$_['help_shipping']            = 'Fixed shipping cost + country code (e.g. GR). Empty cost = no shipping element is sent.';
+$_['help_vat_default']         = 'Used when a product has no tax class (price is then treated as VAT-inclusive).';
+$_['help_ean_field']           = 'The EAN/barcode field is sent as g:gtin.';
+$_['help_gender']              = 'Optional. Sent for every product (e.g. unisex for shoes). Empty = not sent.';
+$_['help_google_category']     = 'Optional. Google taxonomy ID or full string (e.g. 187 = Shoes). Same for all products.';
+$_['help_strip_html']          = 'Google does not allow HTML in fields. Recommended: Yes.';
+$_['help_variations']          = 'Each in-stock size becomes its own <item> sharing an item_group_id. Required for shoes/apparel.';
+$_['help_size_source']         = 'Where product sizes come from. Choose the option/attribute that holds sizes.';
+$_['help_color_source']        = 'Where product color comes from.';
+$_['help_availability_instock'] = 'Value sent when a product (or size) has quantity > 0.';
+$_['help_availability_map']    = 'For out-of-stock items, map each OC stock status to a Google value (or exclude the product).';
+$_['help_buffer']              = 'Adjust the final price (with VAT). Precedence: product > category > manufacturer > general.';
+$_['help_labels']              = 'custom_label_0–4 are used for campaign segmentation. Set a source per label and, optionally, rules that override it.';
+$_['help_price_buckets']       = 'Ranges for the "Price range" source, comma-separated. E.g. 0-30,30-60,60-100,100- (open last = 100+).';
+$_['help_label_rules']         = 'First matching rule (per label) overrides the source. For category/manufacturer, search & pick (autocomplete); for price_min/max fill the amount; on_sale needs no value.';
+
+// Button
+$_['button_save']              = 'Save';
+$_['button_cancel']            = 'Cancel';
+$_['button_add']               = 'Add rule';
+$_['button_remove']            = 'Remove';
+$_['button_check_all']         = 'Check all';
+$_['button_uncheck_all']       = 'Uncheck all';
+
+// Error
+$_['error_permission']         = 'Warning: You do not have permission to modify the Google Merchant feed!';
+$_['error_warning']            = 'Warning: Please check the form carefully for errors!';

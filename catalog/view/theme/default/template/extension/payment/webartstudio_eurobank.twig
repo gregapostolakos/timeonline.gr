@@ -1,0 +1,51 @@
+{% if output_type == 'checkout' %}
+<div id="was-eurobank-checkout">
+  <form action="{{ action }}" method="post" id="was-eurobank-confirm-form" accept-charset="UTF-8">
+    {% if installments_status and installments %}
+    <div class="form-group" style="margin-bottom:15px;">
+      <label for="was-inst"><strong>{{ text_installments }}</strong></label>
+      <select name="inst_selection" id="was-inst" class="form-control">
+        <option value="0">{{ text_no_inst }}</option>
+        {% for inst in installments %}
+        <option value="{{ inst.value }}">{{ inst.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% else %}
+    <input type="hidden" name="inst_selection" value="0"/>
+    {% endif %}
+
+    <div class="buttons">
+      <div class="pull-right">
+        <button type="submit" id="button-confirm" class="btn btn-primary">{{ button_confirm }}</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+// Βελτιωση: αν το theme δεσμευει το #button-confirm, εξαναγκαζουμε submit της φορμας
+(function() {
+  var btn = document.getElementById('button-confirm');
+  if (btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('was-eurobank-confirm-form').submit();
+    });
+  }
+})();
+</script>
+
+{% elseif output_type == 'submit' %}
+{{ header }}
+<div style="text-align:center; padding:60px 20px;">
+  <p style="font-size:18px;">{{ text_redirecting }}</p>
+  <p><i class="fa fa-spinner fa-spin fa-3x"></i></p>
+</div>
+{{ submitform_output }}
+<script type="text/javascript">
+  document.wasEurobankForm.submit();
+</script>
+{{ footer }}
+{% endif %}

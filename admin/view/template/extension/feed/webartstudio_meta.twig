@@ -1,0 +1,726 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="container-fluid">
+    <div class="was-ui">
+
+      <!-- ── Hero header ── -->
+      <div class="was-hero">
+        <div class="was-hero-left">
+          <div class="was-logo-chip"><img src="view/image/webartstudio/logo.png" alt="Webartstudio" class="was-logo-img"/></div>
+          <h1 class="was-hero-title">{{ heading_title }}</h1>
+          <p class="was-hero-sub">Meta Catalog · RSS 2.0 &amp; item_group variations</p>
+        </div>
+        <div class="was-hero-actions">
+          <button type="submit" form="form-google" class="was-btn was-btn-light"><i class="fa fa-save"></i> {{ button_save }}</button>
+          <a href="{{ cancel }}" class="was-btn was-btn-light"><i class="fa fa-reply"></i> {{ button_cancel }}</a>
+        </div>
+      </div>
+
+      {% if error_warning %}
+        <div class="was-alert was-alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+          <button type="button" class="close" onclick="this.parentNode.remove();">&times;</button></div>
+      {% endif %}
+      {% if success %}
+        <div class="was-alert was-alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+          <button type="button" class="close" onclick="this.parentNode.remove();">&times;</button></div>
+      {% endif %}
+
+      <div class="was-card">
+        <div class="was-card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-google">
+
+            <ul class="was-tabs">
+              <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+              <li><a href="#tab-mapping" data-toggle="tab">{{ tab_mapping }}</a></li>
+              <li><a href="#tab-availability" data-toggle="tab">{{ tab_availability }}</a></li>
+              <li><a href="#tab-labels" data-toggle="tab">{{ tab_labels }}</a></li>
+              <li><a href="#tab-exclude" data-toggle="tab">{{ tab_exclude }}</a></li>
+              <li><a href="#tab-buffer" data-toggle="tab">{{ tab_buffer }}</a></li>
+              <li><a href="#tab-support" data-toggle="tab">{{ tab_support }}</a></li>
+            </ul>
+
+            <div class="tab-content">
+
+              {# ============================ GENERAL ============================ #}
+              <div class="tab-pane active" id="tab-general">
+
+                <div class="was-section-title"><i class="fa fa-rss"></i> {{ text_feed_url }}</div>
+                <div class="was-row">
+                  <input type="text" value="{{ feed_url }}" class="was-input" readonly onclick="this.select();"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_status }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="feed_webartstudio_meta_status" value="1" {{ feed_webartstudio_meta_status ? 'checked' }}/> <span>{{ text_enabled }}</span></label>
+                    <label><input type="radio" name="feed_webartstudio_meta_status" value="0" {{ not feed_webartstudio_meta_status ? 'checked' }}/> <span>{{ text_disabled }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_store }}</label>
+                  <select name="feed_webartstudio_meta_store_id" class="was-select">
+                    {% for store in stores %}
+                      <option value="{{ store.store_id }}" {{ store.store_id == feed_webartstudio_meta_store_id ? 'selected' }}>{{ store.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_language }}</label>
+                  <select name="feed_webartstudio_meta_language_id" class="was-select">
+                    {% for language in languages %}
+                      <option value="{{ language.language_id }}" {{ language.language_id == feed_webartstudio_meta_language_id ? 'selected' }}>{{ language.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_customer_group }}</label>
+                  <select name="feed_webartstudio_meta_customer_group_id" class="was-select">
+                    {% for cg in customer_groups %}
+                      <option value="{{ cg.customer_group_id }}" {{ cg.customer_group_id == feed_webartstudio_meta_customer_group_id ? 'selected' }}>{{ cg.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="was-help">{{ help_customer_group }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_mask }}</label>
+                  <input type="text" name="feed_webartstudio_meta_mask" value="{{ feed_webartstudio_meta_mask }}" placeholder="meta.xml" class="was-input"/>
+                  <div class="was-help">{{ help_mask }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_currency }}</label>
+                  <input type="text" name="feed_webartstudio_meta_currency" value="{{ feed_webartstudio_meta_currency }}" placeholder="EUR" class="was-input" style="max-width:120px"/>
+                  <div class="was-help">{{ help_currency }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_weight_unit }}</label>
+                  <select name="feed_webartstudio_meta_weight_unit" class="was-select">
+                    <option value="g" {{ feed_webartstudio_meta_weight_unit == 'g' ? 'selected' }}>{{ text_weight_g }}</option>
+                    <option value="kg" {{ feed_webartstudio_meta_weight_unit == 'kg' ? 'selected' }}>{{ text_weight_kg }}</option>
+                  </select>
+                  <div class="was-help">{{ help_weight_unit }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_vat_default }}</label>
+                  <div class="was-flex">
+                    <input type="text" name="feed_webartstudio_meta_vat_default" value="{{ feed_webartstudio_meta_vat_default }}" class="was-input" style="max-width:120px"/>
+                    <span style="color:var(--was-text-muted);font-weight:600">%</span>
+                  </div>
+                  <div class="was-help">{{ help_vat_default }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_shipping }}</label>
+                  <div class="was-flex">
+                    <input type="text" name="feed_webartstudio_meta_shipping" value="{{ feed_webartstudio_meta_shipping }}" placeholder="0.00" class="was-input" style="max-width:160px"/>
+                    <input type="text" name="feed_webartstudio_meta_shipping_country" value="{{ feed_webartstudio_meta_shipping_country }}" placeholder="GR" class="was-input" style="max-width:100px"/>
+                  </div>
+                  <div class="was-help">{{ help_shipping }}</div>
+                </div>
+              </div>
+
+              {# ============================ MAPPING ============================ #}
+              <div class="tab-pane" id="tab-mapping">
+                <div class="was-row">
+                  <label class="was-label">{{ entry_mpn_field }}</label>
+                  <select name="feed_webartstudio_meta_mpn_field" class="was-select">
+                    {% for src in field_sources %}
+                      <option value="{{ src }}" {{ src == feed_webartstudio_meta_mpn_field ? 'selected' }}>{{ src|upper }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_ean_field }}</label>
+                  <select name="feed_webartstudio_meta_ean_field" class="was-select">
+                    {% for src in field_sources %}
+                      <option value="{{ src }}" {{ src == feed_webartstudio_meta_ean_field ? 'selected' }}>{{ src|upper }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="was-help">{{ help_ean_field }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_desc_source }}</label>
+                  <select name="feed_webartstudio_meta_desc_source" class="was-select">
+                    <option value="description" {{ feed_webartstudio_meta_desc_source == 'description' ? 'selected' }}>{{ text_desc_description }}</option>
+                    <option value="meta_description" {{ feed_webartstudio_meta_desc_source == 'meta_description' ? 'selected' }}>{{ text_desc_meta }}</option>
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_condition }}</label>
+                  <select name="feed_webartstudio_meta_condition" class="was-select">
+                    {% for c in conditions %}
+                      <option value="{{ c }}" {{ c == feed_webartstudio_meta_condition ? 'selected' }}>{{ c }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_gender }}</label>
+                  <select name="feed_webartstudio_meta_gender" class="was-select">
+                    {% for g in genders %}
+                      <option value="{{ g }}" {{ g == feed_webartstudio_meta_gender ? 'selected' }}>{{ g ? g : text_none }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="was-help">{{ help_gender }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_age_group }}</label>
+                  <select name="feed_webartstudio_meta_age_group" class="was-select">
+                    {% for a in age_groups %}
+                      <option value="{{ a }}" {{ a == feed_webartstudio_meta_age_group ? 'selected' }}>{{ a ? a : text_none }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_google_category }}</label>
+                  <input type="text" name="feed_webartstudio_meta_google_category" value="{{ feed_webartstudio_meta_google_category }}" placeholder="187" class="was-input"/>
+                  <div class="was-help">{{ help_google_category }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_strip_html }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="feed_webartstudio_meta_strip_html" value="1" {{ feed_webartstudio_meta_strip_html ? 'checked' }}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="feed_webartstudio_meta_strip_html" value="0" {{ not feed_webartstudio_meta_strip_html ? 'checked' }}/> <span>{{ text_no }}</span></label>
+                  </div>
+                  <div class="was-help">{{ help_strip_html }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_additional_images }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="feed_webartstudio_meta_additional_images" value="1" {{ feed_webartstudio_meta_additional_images ? 'checked' }}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="feed_webartstudio_meta_additional_images" value="0" {{ not feed_webartstudio_meta_additional_images ? 'checked' }}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_variations }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="feed_webartstudio_meta_variations" value="1" {{ feed_webartstudio_meta_variations ? 'checked' }}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="feed_webartstudio_meta_variations" value="0" {{ not feed_webartstudio_meta_variations ? 'checked' }}/> <span>{{ text_no }}</span></label>
+                  </div>
+                  <div class="was-help">{{ help_variations }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_size_source }}</label>
+                  <select name="feed_webartstudio_meta_size_source" class="was-select">
+                    <option value="none" {{ feed_webartstudio_meta_size_source == 'none' ? 'selected' }}>{{ text_source_none }}</option>
+                    <optgroup label="{{ text_source_option }}">
+                      {% for option in options %}
+                        <option value="option:{{ option.option_id }}" {{ feed_webartstudio_meta_size_source == 'option:' ~ option.option_id ? 'selected' }}>{{ option.name }} [{{ option.type }}]</option>
+                      {% endfor %}
+                    </optgroup>
+                    <optgroup label="{{ text_source_attribute }}">
+                      {% for attribute in attributes %}
+                        <option value="attribute:{{ attribute.attribute_id }}" {{ feed_webartstudio_meta_size_source == 'attribute:' ~ attribute.attribute_id ? 'selected' }}>{{ attribute.name }}</option>
+                      {% endfor %}
+                    </optgroup>
+                  </select>
+                  <div class="was-help">{{ help_size_source }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_color_source }}</label>
+                  <select name="feed_webartstudio_meta_color_source" class="was-select">
+                    <option value="none" {{ feed_webartstudio_meta_color_source == 'none' ? 'selected' }}>{{ text_source_none }}</option>
+                    <optgroup label="{{ text_source_option }}">
+                      {% for option in options %}
+                        <option value="option:{{ option.option_id }}" {{ feed_webartstudio_meta_color_source == 'option:' ~ option.option_id ? 'selected' }}>{{ option.name }} [{{ option.type }}]</option>
+                      {% endfor %}
+                    </optgroup>
+                    <optgroup label="{{ text_source_attribute }}">
+                      {% for attribute in attributes %}
+                        <option value="attribute:{{ attribute.attribute_id }}" {{ feed_webartstudio_meta_color_source == 'attribute:' ~ attribute.attribute_id ? 'selected' }}>{{ attribute.name }}</option>
+                      {% endfor %}
+                    </optgroup>
+                  </select>
+                  <div class="was-help">{{ help_color_source }}</div>
+                </div>
+              </div>
+
+              {# ========================= AVAILABILITY ========================= #}
+              <div class="tab-pane" id="tab-availability">
+                <div class="was-row">
+                  <label class="was-label">{{ entry_availability_instock }}</label>
+                  <select name="feed_webartstudio_meta_availability_instock" class="was-select">
+                    {% for expr in availability_expressions %}
+                      <option value="{{ expr }}" {{ expr == feed_webartstudio_meta_availability_instock ? 'selected' }}>{{ expr }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="was-help">{{ help_availability_instock }}</div>
+                </div>
+
+                <div class="was-section-title was-mt">{{ entry_availability_map }}</div>
+                <div class="was-help" style="margin-bottom:12px">{{ help_availability_map }}</div>
+                <table class="was-table">
+                  <thead><tr><th>{{ column_stock_status }}</th><th>{{ column_availability }}</th></tr></thead>
+                  <tbody>
+                    {% for status in stock_statuses %}
+                      {% set cur = feed_webartstudio_meta_availability_map[status.stock_status_id]|default('') %}
+                      <tr>
+                        <td>{{ status.name }}</td>
+                        <td>
+                          <select name="feed_webartstudio_meta_availability_map[{{ status.stock_status_id }}]" class="was-select">
+                            <option value="" {{ cur == '' ? 'selected' }}>{{ text_exclude_skip }}</option>
+                            {% for expr in availability_expressions %}
+                              <option value="{{ expr }}" {{ expr == cur ? 'selected' }}>{{ expr }}</option>
+                            {% endfor %}
+                          </select>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+                <div class="was-section-title was-mt">{{ entry_exclude_stock }}</div>
+                <div class="was-tagbox">
+                  {% for status in stock_statuses %}
+                    <label class="was-check">
+                      <input type="checkbox" name="feed_webartstudio_meta_exclude_stock[]" value="{{ status.stock_status_id }}" {{ status.stock_status_id in feed_webartstudio_meta_exclude_stock ? 'checked' }}/>
+                      <span>{{ status.name }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              {# ========================= CUSTOM LABELS ========================= #}
+              <div class="tab-pane" id="tab-labels">
+                <div class="was-help" style="margin-bottom:16px">{{ help_labels }}</div>
+
+                <div class="was-section-title">{{ entry_label_sources }}</div>
+                {% for i in label_indexes %}
+                  <div class="was-row">
+                    <label class="was-label">custom_label_{{ i }}</label>
+                    <select name="feed_webartstudio_meta_label_{{ i }}_source" class="was-select">
+                      {% set cur = label_sources[i] %}
+                      <option value="none" {{ cur == 'none' ? 'selected' }}>{{ text_source_none }}</option>
+                      <option value="manufacturer" {{ cur == 'manufacturer' ? 'selected' }}>{{ text_label_manufacturer }}</option>
+                      <option value="category" {{ cur == 'category' ? 'selected' }}>{{ text_label_category }}</option>
+                      <option value="category_last" {{ cur == 'category_last' ? 'selected' }}>{{ text_label_category_last }}</option>
+                      <option value="category_path" {{ cur == 'category_path' ? 'selected' }}>{{ text_label_category_path }}</option>
+                      <option value="on_sale" {{ cur == 'on_sale' ? 'selected' }}>{{ text_label_on_sale }}</option>
+                      <option value="price_range" {{ cur == 'price_range' ? 'selected' }}>{{ text_label_price_range }}</option>
+                      <option value="availability" {{ cur == 'availability' ? 'selected' }}>{{ text_label_availability }}</option>
+                      <optgroup label="{{ text_source_attribute }}">
+                        {% for attribute in attributes %}
+                          <option value="attribute:{{ attribute.attribute_id }}" {{ cur == 'attribute:' ~ attribute.attribute_id ? 'selected' }}>{{ attribute.name }}</option>
+                        {% endfor %}
+                      </optgroup>
+                      <optgroup label="{{ text_source_option }}">
+                        {% for option in options %}
+                          <option value="option:{{ option.option_id }}" {{ cur == 'option:' ~ option.option_id ? 'selected' }}>{{ option.name }} [{{ option.type }}]</option>
+                        {% endfor %}
+                      </optgroup>
+                    </select>
+                  </div>
+                {% endfor %}
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_price_buckets }}</label>
+                  <input type="text" name="feed_webartstudio_meta_price_buckets" value="{{ feed_webartstudio_meta_price_buckets }}" placeholder="0-30,30-60,60-100,100-" class="was-input"/>
+                  <div class="was-help">{{ help_price_buckets }}</div>
+                </div>
+
+                <div class="was-section-title was-mt">{{ entry_label_rules }}</div>
+                <div class="was-help" style="margin-bottom:12px">{{ help_label_rules }}</div>
+                <table class="was-table">
+                  <thead><tr>
+                    <th style="width:130px">{{ column_label }}</th>
+                    <th style="width:190px">{{ column_rule_type }}</th>
+                    <th style="width:300px">{{ column_rule_ref }}</th>
+                    <th style="width:120px">{{ column_rule_num }}</th>
+                    <th>{{ column_rule_output }}</th>
+                    <th style="width:48px"></th>
+                  </tr></thead>
+                  <tbody id="label-rules-body">
+                    {% for rule in label_rules %}
+                      <tr>
+                        <td>
+                          <select name="label_rule_label[]" class="was-select">
+                            {% for i in label_indexes %}<option value="{{ i }}" {{ i == rule.label ? 'selected' }}>Label {{ i }}</option>{% endfor %}
+                          </select>
+                        </td>
+                        <td>
+                          <select name="label_rule_type[]" class="was-select rule-type">
+                            {% for t in rule_types %}<option value="{{ t }}" {{ t == rule.type ? 'selected' }}>{{ t }}</option>{% endfor %}
+                          </select>
+                        </td>
+                        <td class="rule-ref-cell">
+                          <input type="text" class="was-input rule-ref-search" value="{{ rule.ref_name }}" placeholder="{{ text_autocomplete }}" autocomplete="off"/>
+                          <input type="hidden" name="label_rule_ref[]" class="rule-ref" value="{{ rule.ref }}"/>
+                          <span class="rule-na">—</span>
+                        </td>
+                        <td class="rule-num-cell">
+                          <input type="text" name="label_rule_num[]" class="was-input rule-num" value="{{ rule.num }}" placeholder="0.00"/>
+                          <span class="rule-na">—</span>
+                        </td>
+                        <td><input type="text" name="label_rule_output[]" value="{{ rule.output }}" placeholder="{{ text_label_value }}" class="was-input"/></td>
+                        <td style="text-align:right"><button type="button" class="was-btn was-btn-danger was-btn-icon label-rule-remove"><i class="fa fa-minus"></i></button></td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="was-mt">
+                  <button type="button" class="was-btn was-btn-secondary was-btn-sm" id="add-label-rule"><i class="fa fa-plus"></i> {{ button_add }}</button>
+                </div>
+              </div>
+
+              {# =========================== EXCLUDES =========================== #}
+              <div class="tab-pane" id="tab-exclude">
+                <div class="was-section-title">{{ entry_exclude_empty }}</div>
+                <div class="was-tagbox">
+                  {% for key, label in {'ean': text_empty_ean, 'mpn': text_empty_mpn, 'image': text_empty_image, 'manufacturer': text_empty_manufacturer, 'price': text_empty_price} %}
+                    <label class="was-check">
+                      <input type="checkbox" name="feed_webartstudio_meta_exclude_empty[]" value="{{ key }}" {{ key in feed_webartstudio_meta_exclude_empty ? 'checked' }}/>
+                      <span>{{ label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+
+                <div class="was-section-title was-mt">{{ entry_exclude_product }}</div>
+                <div class="was-row">
+                  <input type="text" name="autocomplete_product" value="" placeholder="{{ text_autocomplete }}" class="was-input"/>
+                  <div id="exclude-product" class="was-listbox">
+                    {% for row in exclude_products %}
+                      <div id="exclude-product-{{ row.reference_id }}" class="was-listitem"><i class="fa fa-minus-circle"></i> {{ row.name }}
+                        <input type="hidden" name="exclude_product[]" value="{{ row.reference_id }}"/></div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="was-section-title was-mt">{{ entry_exclude_category }}</div>
+                <div class="was-row">
+                  <input type="text" name="autocomplete_category" value="" placeholder="{{ text_autocomplete }}" class="was-input"/>
+                  <div id="exclude-category-list" class="was-checklist">
+                    {% for category in categories %}
+                      <label class="was-checkrow" data-category-id="{{ category.category_id }}" data-parent-id="{{ category.parent_id }}">
+                        <input type="checkbox" name="exclude_category[]" value="{{ category.category_id }}" {{ category.category_id in exclude_selected_category ? 'checked' }}/>
+                        <span>{{ category.name }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                  <div class="was-flex was-mt">
+                    <button type="button" class="was-btn was-btn-secondary was-btn-sm" id="check-all-categories"><i class="fa fa-check-square-o"></i> {{ button_check_all }}</button>
+                    <button type="button" class="was-btn was-btn-secondary was-btn-sm" id="uncheck-all-categories"><i class="fa fa-square-o"></i> {{ button_uncheck_all }}</button>
+                  </div>
+                </div>
+
+                <div class="was-section-title was-mt">{{ entry_exclude_manufacturer }}</div>
+                <div class="was-row">
+                  <input type="text" name="autocomplete_manufacturer" value="" placeholder="{{ text_autocomplete }}" class="was-input"/>
+                  <div id="exclude-manufacturer-list" class="was-checklist">
+                    {% for m in manufacturers %}
+                      <label class="was-checkrow" data-manufacturer-id="{{ m.manufacturer_id }}">
+                        <input type="checkbox" name="exclude_manufacturer[]" value="{{ m.manufacturer_id }}" {{ m.manufacturer_id in exclude_selected_manufacturer ? 'checked' }}/>
+                        <span>{{ m.name }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                  <div class="was-flex was-mt">
+                    <button type="button" class="was-btn was-btn-secondary was-btn-sm" id="check-all-manufacturers"><i class="fa fa-check-square-o"></i> {{ button_check_all }}</button>
+                    <button type="button" class="was-btn was-btn-secondary was-btn-sm" id="uncheck-all-manufacturers"><i class="fa fa-square-o"></i> {{ button_uncheck_all }}</button>
+                  </div>
+                </div>
+              </div>
+
+              {# ============================ BUFFER ============================ #}
+              <div class="tab-pane" id="tab-buffer">
+                <div class="was-help" style="margin-bottom:16px">{{ help_buffer }}</div>
+
+                <div class="was-section-title">{{ entry_buffer_general }}</div>
+                <div class="was-row">
+                  <div class="was-flex">
+                    <select name="feed_webartstudio_meta_buffer_op" class="was-select" style="max-width:200px">
+                      <option value="percent" {{ feed_webartstudio_meta_buffer_op == 'percent' ? 'selected' }}>{{ text_percent }}</option>
+                      <option value="fixed" {{ feed_webartstudio_meta_buffer_op == 'fixed' ? 'selected' }}>{{ text_fixed }}</option>
+                    </select>
+                    <input type="text" name="feed_webartstudio_meta_buffer_val" value="{{ feed_webartstudio_meta_buffer_val }}" placeholder="0" class="was-input" style="max-width:160px"/>
+                  </div>
+                </div>
+                <div class="was-row">
+                  <label class="was-label">{{ entry_buffer_round }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="feed_webartstudio_meta_buffer_round" value="1" {{ feed_webartstudio_meta_buffer_round ? 'checked' }}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="feed_webartstudio_meta_buffer_round" value="0" {{ not feed_webartstudio_meta_buffer_round ? 'checked' }}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                {% for btype in ['product', 'category', 'manufacturer'] %}
+                  <div class="was-section-title was-mt">{{ attribute({'product': entry_buffer_product, 'category': entry_buffer_category, 'manufacturer': entry_buffer_manufacturer}, btype) }}</div>
+                  <div class="was-row">
+                    <input type="text" name="autocomplete_buffer_{{ btype }}" value="" placeholder="{{ text_autocomplete }}" class="was-input"/>
+                    <table class="was-table was-mt">
+                      <thead><tr><th>{{ column_name }}</th><th style="width:160px">{{ column_operation }}</th><th style="width:130px">{{ column_value }}</th><th style="width:60px"></th></tr></thead>
+                      <tbody id="buffer-{{ btype }}-body">
+                        {% for row in attribute(buffers, btype) %}
+                          <tr id="buffer-{{ btype }}-{{ row.reference_id }}">
+                            <td>{{ row.name }}<input type="hidden" name="buffer_{{ btype }}_id[]" value="{{ row.reference_id }}"/></td>
+                            <td>
+                              <select name="buffer_{{ btype }}_op[]" class="was-select">
+                                <option value="percent" {{ row.operation == 'percent' ? 'selected' }}>{{ text_percent }}</option>
+                                <option value="fixed" {{ row.operation == 'fixed' ? 'selected' }}>{{ text_fixed }}</option>
+                              </select>
+                            </td>
+                            <td><input type="text" name="buffer_{{ btype }}_val[]" value="{{ row.value }}" class="was-input"/></td>
+                            <td style="text-align:right"><button type="button" class="was-btn was-btn-danger was-btn-icon buffer-remove"><i class="fa fa-minus"></i></button></td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endfor %}
+              </div>
+
+              {# ============================ SUPPORT ============================ #}
+              <div class="tab-pane" id="tab-support">
+
+                <div class="was-section-title">{{ copyright_title }}</div>
+                <p style="color:var(--was-text-muted);line-height:1.7;margin:0 0 8px">{{ copyright_body }}</p>
+                <p style="color:var(--was-text-dim);font-size:12px;margin:0">&copy; {{ "now"|date("Y") }} Webartstudio - {{ text_rights }}</p>
+
+                <div class="was-section-title was-mt">{{ support_title }}</div>
+                <p style="color:var(--was-text-muted);line-height:1.7;margin:0 0 14px">{{ support_body }}</p>
+                <div class="was-flex">
+                  <a href="mailto:info@webartstudio.gr" class="was-btn was-btn-primary"><i class="fa fa-envelope"></i> info@webartstudio.gr</a>
+                  <a href="tel:+302102203290" class="was-btn was-btn-secondary"><i class="fa fa-phone"></i> 210 220 3290</a>
+                </div>
+                <p style="color:var(--was-text-dim);font-size:12.5px;margin:14px 0 0"><i class="fa fa-clock-o"></i> {{ support_hours }}</p>
+                <p style="color:var(--was-text-dim);font-size:12.5px;margin:6px 0 0">{{ support_note }}</p>
+
+                <div class="was-section-title was-mt">{{ text_about }}</div>
+                <div class="was-flex">
+                  <span class="was-badge was-badge-primary">{{ text_version }} 1.0.0</span>
+                  <span class="was-badge was-badge-success"><i class="fa fa-rss"></i>&nbsp; Meta Catalog Feed</span>
+                  <a href="https://www.webartstudio.gr" target="_blank" rel="noopener" class="was-btn was-btn-secondary"><i class="fa fa-globe"></i> webartstudio.gr</a>
+                </div>
+
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.was-ui .was-listbox{margin-top:10px;max-height:170px;overflow:auto;border:1px solid var(--was-border);border-radius:var(--was-radius-md);background:var(--was-surface);padding:6px}
+.was-ui .was-listbox:empty{display:none}
+.was-ui .was-listitem{padding:7px 10px;border-radius:var(--was-radius-sm);font-size:13px;display:flex;align-items:center;gap:8px}
+.was-ui .was-listitem:hover{background:var(--was-surface-hover)}
+.was-ui .was-listitem .fa-minus-circle{color:var(--was-danger);cursor:pointer}
+.was-ui .was-tagbox{display:flex;flex-wrap:wrap;gap:8px}
+.was-ui .was-check{display:inline-flex;align-items:center;gap:8px;margin:0;padding:9px 14px;border:1px solid var(--was-border);border-radius:var(--was-radius-md);background:var(--was-surface);font-size:13px;font-weight:600;color:var(--was-text-muted);cursor:pointer;transition:all .15s var(--was-ease)}
+.was-ui .was-check:hover{border-color:rgba(43,38,32,.20)}
+.was-ui .was-check input{accent-color:var(--was-primary);margin:0}
+.was-ui .was-check:has(input:checked){background:var(--was-primary-soft);border-color:var(--was-primary);color:var(--was-primary)}
+.was-ui .was-checklist{margin-top:10px;max-height:300px;overflow:auto;border:1px solid var(--was-border);border-radius:var(--was-radius-md);background:var(--was-surface);padding:6px}
+.was-ui .was-checkrow{display:flex;align-items:center;gap:9px;margin:0;padding:7px 10px;border-radius:var(--was-radius-sm);font-size:13px;font-weight:500;color:var(--was-text);cursor:pointer;transition:background .4s var(--was-ease)}
+.was-ui .was-checkrow:hover{background:var(--was-surface-hover)}
+.was-ui .was-checkrow input{accent-color:var(--was-primary);margin:0}
+.was-ui .was-checkrow.was-hit{background:var(--was-warning-soft)}
+.was-ui .was-btn-sm{height:32px;padding:0 12px;font-size:12.5px}
+/* custom-label rules table */
+.was-ui #label-rules-body td{vertical-align:middle}
+.was-ui #label-rules-body .was-input,.was-ui #label-rules-body .was-select{width:100%}
+.was-ui .rule-ref-cell{position:relative}
+.was-ui .rule-ref-cell .dropdown-menu{position:absolute;top:100%;left:0;min-width:100%;max-height:230px;overflow-y:auto;z-index:1000;margin-top:2px}
+.was-ui .rule-na{color:var(--was-text-dim)}
+</style>
+
+<script type="text/javascript"><!--
+var TXT = { percent: '{{ text_percent }}', fixed: '{{ text_fixed }}' };
+var RULE_TYPES = {{ rule_types|json_encode|raw }};
+var LABEL_INDEXES = {{ label_indexes|json_encode|raw }};
+
+function bufferRow(btype, id, name) {
+  if ($('#buffer-' + btype + '-' + id).length) return;
+  var html = '<tr id="buffer-' + btype + '-' + id + '">'
+    + '<td>' + name + '<input type="hidden" name="buffer_' + btype + '_id[]" value="' + id + '"/></td>'
+    + '<td><select name="buffer_' + btype + '_op[]" class="was-select"><option value="percent">' + TXT.percent + '</option><option value="fixed">' + TXT.fixed + '</option></select></td>'
+    + '<td><input type="text" name="buffer_' + btype + '_val[]" value="0" class="was-input"/></td>'
+    + '<td style="text-align:right"><button type="button" class="was-btn was-btn-danger was-btn-icon buffer-remove"><i class="fa fa-minus"></i></button></td></tr>';
+  $('#buffer-' + btype + '-body').append(html);
+}
+
+// --- custom-label rules: add / remove rows + type-aware autocomplete ---
+var RULE_AC_URL = 'index.php?route=extension/feed/webartstudio_meta/autocomplete&user_token={{ user_token }}';
+
+// Show the reference (category/manufacturer) or amount cell depending on type.
+function ruleApplyType($tr) {
+  var t = $tr.find('.rule-type').val();
+  var isRef = (t === 'category' || t === 'manufacturer');
+  var isNum = (t === 'price_min' || t === 'price_max');
+  $tr.find('.rule-ref-search').toggle(isRef);
+  $tr.find('.rule-ref-cell .rule-na').toggle(!isRef);
+  $tr.find('.rule-num').toggle(isNum);
+  $tr.find('.rule-num-cell .rule-na').toggle(!isNum);
+}
+
+function bindRule($tr) {
+  var $type   = $tr.find('.rule-type');
+  var $search = $tr.find('.rule-ref-search');
+  var $ref    = $tr.find('.rule-ref');
+
+  $type.on('change', function() { ruleApplyType($tr); $search.val(''); $ref.val(''); });
+  ruleApplyType($tr);
+
+  $search.autocomplete({
+    'source': function(request, response) {
+      var t = $type.val();
+      if (t !== 'category' && t !== 'manufacturer') { response([]); return; }
+      $.ajax({
+        url: RULE_AC_URL + '&type=' + t + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) { return { label: item.name, value: item.reference_id }; }));
+        }
+      });
+    },
+    'select': function(item) {
+      $search.val(item.label);
+      $ref.val(item.value);
+    }
+  });
+}
+
+function labelRuleRow() {
+  var labelOpts = '';
+  LABEL_INDEXES.forEach(function(i) { labelOpts += '<option value="' + i + '">Label ' + i + '</option>'; });
+  var typeOpts = '';
+  RULE_TYPES.forEach(function(t) { typeOpts += '<option value="' + t + '">' + t + '</option>'; });
+  var html = '<tr>'
+    + '<td><select name="label_rule_label[]" class="was-select">' + labelOpts + '</select></td>'
+    + '<td><select name="label_rule_type[]" class="was-select rule-type">' + typeOpts + '</select></td>'
+    + '<td class="rule-ref-cell"><input type="text" class="was-input rule-ref-search" value="" placeholder="{{ text_autocomplete }}" autocomplete="off"/><input type="hidden" name="label_rule_ref[]" class="rule-ref" value=""/><span class="rule-na">—</span></td>'
+    + '<td class="rule-num-cell"><input type="text" name="label_rule_num[]" class="was-input rule-num" value="" placeholder="0.00"/><span class="rule-na">—</span></td>'
+    + '<td><input type="text" name="label_rule_output[]" value="" placeholder="{{ text_label_value }}" class="was-input"/></td>'
+    + '<td style="text-align:right"><button type="button" class="was-btn was-btn-danger was-btn-icon label-rule-remove"><i class="fa fa-minus"></i></button></td></tr>';
+  var $tr = $(html);
+  $('#label-rules-body').append($tr);
+  bindRule($tr);
+}
+$('#add-label-rule').on('click', labelRuleRow);
+$('#label-rules-body').on('click', '.label-rule-remove', function() { $(this).closest('tr').remove(); });
+
+// Bind autocomplete + type toggle on any rules restored from settings.
+$('#label-rules-body tr').each(function() { bindRule($(this)); });
+
+// --- exclude products: autocomplete + add/remove pills ---
+$('input[name=\'autocomplete_product\']').autocomplete({
+  'source': function(request, response) {
+    $.ajax({
+      url: 'index.php?route=extension/feed/webartstudio_meta/autocomplete&user_token={{ user_token }}&type=product&filter_name=' + encodeURIComponent(request),
+      dataType: 'json',
+      success: function(json) {
+        response($.map(json, function(item) { return { label: item.name, value: item.reference_id }; }));
+      }
+    });
+  },
+  'select': function(item) {
+    $('input[name=\'autocomplete_product\']').val('');
+    if ($('#exclude-product-' + item.value).length) return;
+    $('#exclude-product').append('<div id="exclude-product-' + item.value + '" class="was-listitem"><i class="fa fa-minus-circle"></i> ' + item.label
+      + '<input type="hidden" name="exclude_product[]" value="' + item.value + '"/></div>');
+  }
+});
+$('#exclude-product').on('click', '.fa-minus-circle', function() { $(this).parent().remove(); });
+
+// --- exclude categories / manufacturers: full checkbox lists ---
+var categoryChildren = {};
+$('#exclude-category-list [data-category-id]').each(function() {
+  var id = parseInt($(this).data('category-id'));
+  var parentId = parseInt($(this).data('parent-id'));
+  if (parentId > 0) {
+    (categoryChildren[parentId] = categoryChildren[parentId] || []).push(id);
+  }
+});
+function categoryDescendants(id) {
+  var out = [], kids = categoryChildren[id] || [];
+  for (var i = 0; i < kids.length; i++) { out.push(kids[i]); out = out.concat(categoryDescendants(kids[i])); }
+  return out;
+}
+function highlightRow($row, $list) {
+  if (!$row.length) return;
+  $row.addClass('was-hit');
+  setTimeout(function() { $row.removeClass('was-hit'); }, 800);
+  $list.scrollTop($list.scrollTop() + $row.position().top - 20);
+}
+
+$('#exclude-category-list').on('change', 'input[type="checkbox"]', function() {
+  if ($(this).prop('checked')) {
+    var id = parseInt($(this).closest('[data-category-id]').data('category-id'));
+    categoryDescendants(id).forEach(function(d) {
+      $('#exclude-category-list [data-category-id="' + d + '"] input[type="checkbox"]').prop('checked', true);
+    });
+  }
+});
+
+function listAutocomplete(inputName, type, listId, attr, withChildren) {
+  $('input[name=\'' + inputName + '\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=extension/feed/webartstudio_meta/autocomplete&user_token={{ user_token }}&type=' + type + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) { return { label: item.name, value: item.reference_id }; }));
+        }
+      });
+    },
+    'select': function(item) {
+      $('input[name=\'' + inputName + '\']').val('');
+      var $list = $('#' + listId);
+      var $row = $list.find('[' + attr + '="' + item.value + '"]');
+      var ids = [parseInt(item.value)];
+      if (withChildren) ids = ids.concat(categoryDescendants(parseInt(item.value)));
+      ids.forEach(function(d) { $list.find('[' + attr + '="' + d + '"] input[type="checkbox"]').prop('checked', true); });
+      highlightRow($row, $list);
+    }
+  });
+}
+listAutocomplete('autocomplete_category', 'category', 'exclude-category-list', 'data-category-id', true);
+listAutocomplete('autocomplete_manufacturer', 'manufacturer', 'exclude-manufacturer-list', 'data-manufacturer-id', false);
+
+$('#check-all-categories').on('click', function() { $('#exclude-category-list input[type=checkbox]').prop('checked', true); });
+$('#uncheck-all-categories').on('click', function() { $('#exclude-category-list input[type=checkbox]').prop('checked', false); });
+$('#check-all-manufacturers').on('click', function() { $('#exclude-manufacturer-list input[type=checkbox]').prop('checked', true); });
+$('#uncheck-all-manufacturers').on('click', function() { $('#exclude-manufacturer-list input[type=checkbox]').prop('checked', false); });
+
+['product', 'category', 'manufacturer'].forEach(function(type) {
+  $('input[name=\'autocomplete_buffer_' + type + '\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=extension/feed/webartstudio_meta/autocomplete&user_token={{ user_token }}&type=' + type + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) { return { label: item.name, value: item.reference_id }; }));
+        }
+      });
+    },
+    'select': function(item) {
+      $('input[name=\'autocomplete_buffer_' + type + '\']').val('');
+      bufferRow(type, item.value, item.label);
+    }
+  });
+});
+
+$('#tab-buffer').on('click', '.buffer-remove', function() {
+  $(this).closest('tr').remove();
+});
+//--></script>
+{{ footer }}

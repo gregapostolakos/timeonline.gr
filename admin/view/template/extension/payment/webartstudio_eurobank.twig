@@ -1,0 +1,318 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="container-fluid">
+    <div class="was-ui">
+
+      <!-- ── Hero header ── -->
+      <div class="was-hero">
+        <div class="was-hero-left">
+          <div class="was-logo-chip"><img src="view/image/webartstudio/logo.png" alt="Webartstudio" class="was-logo-img"/></div>
+          <h1 class="was-hero-title">Eurobank Payment Gateway</h1>
+          <p class="was-hero-sub">Eurobank e-Commerce (Cardlink) - 3D Secure v2</p>
+        </div>
+        <div class="was-hero-actions">
+          <button type="submit" form="form-payment" class="was-btn was-btn-light"><i class="fa fa-save"></i> {{ button_save }}</button>
+          <a href="{{ cancel }}" class="was-btn was-btn-light"><i class="fa fa-reply"></i> {{ button_cancel }}</a>
+        </div>
+      </div>
+
+      <div id="alert-box"></div>
+
+      <div class="was-card">
+        <div class="was-card-body">
+          <form id="form-payment" action="{{ action }}" method="post" enctype="multipart/form-data">
+
+            <ul class="was-tabs">
+              <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+              <li><a href="#tab-payment" data-toggle="tab">{{ tab_payment }}</a></li>
+              <li><a href="#tab-installments" data-toggle="tab">{{ tab_installments }}</a></li>
+              <li><a href="#tab-debug" data-toggle="tab">{{ tab_debug }}</a></li>
+              <li><a href="#tab-support" data-toggle="tab">{{ tab_support }}</a></li>
+            </ul>
+
+            <div class="tab-content">
+
+              <!-- ============ ΓΕΝΙΚΑ ============ -->
+              <div class="tab-pane active" id="tab-general">
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_merchant_id }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_merchant_id" value="{{ payment_webartstudio_eurobank_merchant_id }}" class="was-input"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_secret }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_secret" value="{{ payment_webartstudio_eurobank_secret }}" class="was-input"/>
+                  <div class="was-help">{{ help_secret }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_environment }}</label>
+                  <select name="payment_webartstudio_eurobank_environment" class="was-select">
+                    <option value="0" {% if payment_webartstudio_eurobank_environment == '0' %}selected{% endif %}>{{ text_test }}</option>
+                    <option value="1" {% if payment_webartstudio_eurobank_environment == '1' %}selected{% endif %}>{{ text_live }}</option>
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_callback_url }}</label>
+                  <input type="text" value="{{ callback_url }}" class="was-input" readonly onclick="this.select();"/>
+                  <div class="was-help">{{ help_callback_url }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_test_url }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_test_url" value="{{ payment_webartstudio_eurobank_test_url }}" class="was-input" placeholder="https://eurocommerce-test.cardlink.gr/vpos/shophandlermpi"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_live_url }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_live_url" value="{{ payment_webartstudio_eurobank_live_url }}" class="was-input" placeholder="https://vpos.eurocommerce.gr/vpos/shophandlermpi"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_status }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_status" value="1" {% if payment_webartstudio_eurobank_status %}checked{% endif %}/> <span>{{ text_enabled }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_status" value="0" {% if not payment_webartstudio_eurobank_status %}checked{% endif %}/> <span>{{ text_disabled }}</span></label>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ============ ΠΛΗΡΩΜΗ ============ -->
+              <div class="tab-pane" id="tab-payment">
+
+                <div class="was-section-title">{{ entry_title }}</div>
+                {% for language in languages %}
+                <div class="was-row">
+                  <label class="was-label">{{ language.name }}</label>
+                  <div class="was-input-group">
+                    <span class="was-input-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span>
+                    <input type="text" name="payment_webartstudio_eurobank_title[{{ language.language_id }}]" value="{{ payment_webartstudio_eurobank_title[language.language_id] is defined ? payment_webartstudio_eurobank_title[language.language_id] : '' }}" class="was-input" placeholder="Eurobank"/>
+                  </div>
+                </div>
+                {% endfor %}
+
+                <div class="was-section-title was-mt">{{ tab_payment }}</div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_transaction_type }}</label>
+                  <select name="payment_webartstudio_eurobank_transaction_type" class="was-select">
+                    <option value="1" {% if payment_webartstudio_eurobank_transaction_type == '1' %}selected{% endif %}>{{ text_sale }} (1)</option>
+                    <option value="2" {% if payment_webartstudio_eurobank_transaction_type == '2' %}selected{% endif %}>{{ text_preauth }} (2)</option>
+                  </select>
+                  <div class="was-help">{{ help_transaction_type }}</div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_order_status }}</label>
+                  <select name="payment_webartstudio_eurobank_order_status_id" class="was-select">
+                    {% for order_status in order_statuses %}
+                    <option value="{{ order_status.order_status_id }}" {% if order_status.order_status_id == payment_webartstudio_eurobank_order_status_id %}selected{% endif %}>{{ order_status.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_order_status_preauth }}</label>
+                  <select name="payment_webartstudio_eurobank_order_status_preauth_id" class="was-select">
+                    {% for order_status in order_statuses %}
+                    <option value="{{ order_status.order_status_id }}" {% if order_status.order_status_id == payment_webartstudio_eurobank_order_status_preauth_id %}selected{% endif %}>{{ order_status.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_geo_zone }}</label>
+                  <select name="payment_webartstudio_eurobank_geo_zone_id" class="was-select">
+                    <option value="0">{{ text_all_zones }}</option>
+                    {% for geo_zone in geo_zones %}
+                    <option value="{{ geo_zone.geo_zone_id }}" {% if geo_zone.geo_zone_id == payment_webartstudio_eurobank_geo_zone_id %}selected{% endif %}>{{ geo_zone.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_total_min }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_total_min" value="{{ payment_webartstudio_eurobank_total_min }}" class="was-input"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_total_max }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_total_max" value="{{ payment_webartstudio_eurobank_total_max }}" class="was-input"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_only_eur }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_only_accept_eur" value="1" {% if payment_webartstudio_eurobank_only_accept_eur %}checked{% endif %}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_only_accept_eur" value="0" {% if not payment_webartstudio_eurobank_only_accept_eur %}checked{% endif %}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_send_state }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_send_state" value="1" {% if payment_webartstudio_eurobank_send_state %}checked{% endif %}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_send_state" value="0" {% if not payment_webartstudio_eurobank_send_state %}checked{% endif %}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_clear_cart }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_clear_cart" value="1" {% if payment_webartstudio_eurobank_clear_cart %}checked{% endif %}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_clear_cart" value="0" {% if not payment_webartstudio_eurobank_clear_cart %}checked{% endif %}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_css_url }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_css_url" value="{{ payment_webartstudio_eurobank_css_url }}" class="was-input"/>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_sort_order }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_sort_order" value="{{ payment_webartstudio_eurobank_sort_order }}" class="was-input"/>
+                </div>
+
+              </div>
+
+              <!-- ============ ΔΟΣΕΙΣ ============ -->
+              <div class="tab-pane" id="tab-installments">
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_installments_status }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_installments_status" value="1" {% if payment_webartstudio_eurobank_installments_status %}checked{% endif %}/> <span>{{ text_yes }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_installments_status" value="0" {% if not payment_webartstudio_eurobank_installments_status %}checked{% endif %}/> <span>{{ text_no }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_installment_offset }}</label>
+                  <input type="text" name="payment_webartstudio_eurobank_installment_offset" value="{{ payment_webartstudio_eurobank_installment_offset }}" class="was-input"/>
+                </div>
+
+                <table id="inst-table" class="was-table">
+                  <thead>
+                    <tr>
+                      <th>{{ entry_inst_amount }}</th>
+                      <th>{{ entry_inst_max }}</th>
+                      <th>{{ entry_inst_interest }}</th>
+                      <th class="was-right"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% set inst_row = 0 %}
+                    {% for inst in payment_webartstudio_eurobank_installments %}
+                    <tr id="inst-row-{{ inst_row }}">
+                      <td><input type="text" name="payment_webartstudio_eurobank_installments[{{ inst_row }}][amount]" value="{{ inst.amount }}" class="was-input"/></td>
+                      <td><input type="text" name="payment_webartstudio_eurobank_installments[{{ inst_row }}][max]" value="{{ inst.max }}" class="was-input"/></td>
+                      <td><input type="text" name="payment_webartstudio_eurobank_installments[{{ inst_row }}][interest]" value="{{ inst.interest }}" class="was-input"/></td>
+                      <td style="text-align:right"><button type="button" onclick="document.getElementById('inst-row-{{ inst_row }}').remove();" class="was-btn was-btn-danger was-btn-icon"><i class="fa fa-minus"></i></button></td>
+                    </tr>
+                    {% set inst_row = inst_row + 1 %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="was-mt">
+                  <button type="button" onclick="addInst();" class="was-btn was-btn-secondary"><i class="fa fa-plus"></i> {{ button_add_inst }}</button>
+                </div>
+
+              </div>
+
+              <!-- ============ LOG ============ -->
+              <div class="tab-pane" id="tab-debug">
+
+                <div class="was-row">
+                  <label class="was-label">{{ entry_debug }}</label>
+                  <div class="was-radios">
+                    <label><input type="radio" name="payment_webartstudio_eurobank_debug" value="1" {% if payment_webartstudio_eurobank_debug %}checked{% endif %}/> <span>{{ text_enabled }}</span></label>
+                    <label><input type="radio" name="payment_webartstudio_eurobank_debug" value="0" {% if not payment_webartstudio_eurobank_debug %}checked{% endif %}/> <span>{{ text_disabled }}</span></label>
+                  </div>
+                </div>
+
+                <div class="was-row was-flex">
+                  <a href="{{ log_download }}" class="was-btn was-btn-secondary"><i class="fa fa-download"></i> {{ button_log_download }}</a>
+                  <a href="{{ log_clear }}" class="was-btn was-btn-secondary"><i class="fa fa-eraser"></i> {{ button_log_clear }}</a>
+                </div>
+
+                <div class="was-row">
+                  <textarea class="was-textarea was-mono" rows="18" readonly>{{ log_content }}</textarea>
+                </div>
+
+              </div>
+
+              <!-- ============ ΥΠΟΣΤΗΡΙΞΗ ============ -->
+              <div class="tab-pane" id="tab-support">
+
+                <div class="was-section-title">{{ copyright_title }}</div>
+                <p style="color:var(--was-text-muted);line-height:1.7;margin:0 0 8px">{{ copyright_body }}</p>
+                <p style="color:var(--was-text-dim);font-size:12px;margin:0">&copy; {{ "now"|date("Y") }} Webartstudio - {{ text_rights }}</p>
+
+                <div class="was-section-title was-mt">{{ support_title }}</div>
+                <p style="color:var(--was-text-muted);line-height:1.7;margin:0 0 14px">{{ support_body }}</p>
+                <div class="was-flex">
+                  <a href="mailto:info@webartstudio.gr" class="was-btn was-btn-primary"><i class="fa fa-envelope"></i> info@webartstudio.gr</a>
+                  <a href="tel:+302102203290" class="was-btn was-btn-secondary"><i class="fa fa-phone"></i> 210 220 3290</a>
+                </div>
+                <p style="color:var(--was-text-dim);font-size:12.5px;margin:14px 0 0"><i class="fa fa-clock-o"></i> {{ support_hours }}</p>
+                <p style="color:var(--was-text-dim);font-size:12.5px;margin:6px 0 0">{{ support_note }}</p>
+
+                <div class="was-section-title was-mt">{{ text_about }}</div>
+                <div class="was-flex">
+                  <span class="was-badge was-badge-primary">{{ text_version }} 1.0.0</span>
+                  <span class="was-badge was-badge-success"><i class="fa fa-shield"></i>&nbsp; 3D Secure v2</span>
+                  <a href="https://www.webartstudio.gr" target="_blank" rel="noopener" class="was-btn was-btn-secondary"><i class="fa fa-globe"></i> webartstudio.gr</a>
+                </div>
+
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var inst_index = {{ payment_webartstudio_eurobank_installments|length }};
+function addInst() {
+  var html = '<tr id="inst-row-' + inst_index + '">';
+  html += '<td><input type="text" name="payment_webartstudio_eurobank_installments[' + inst_index + '][amount]" value="" class="was-input"/></td>';
+  html += '<td><input type="text" name="payment_webartstudio_eurobank_installments[' + inst_index + '][max]" value="" class="was-input"/></td>';
+  html += '<td><input type="text" name="payment_webartstudio_eurobank_installments[' + inst_index + '][interest]" value="" class="was-input"/></td>';
+  html += '<td style="text-align:right"><button type="button" onclick="document.getElementById(\'inst-row-' + inst_index + '\').remove();" class="was-btn was-btn-danger was-btn-icon"><i class="fa fa-minus"></i></button></td>';
+  html += '</tr>';
+  document.querySelector('#inst-table tbody').insertAdjacentHTML('beforeend', html);
+  inst_index++;
+}
+
+$('#form-payment').on('submit', function(e) {
+  e.preventDefault();
+  $.ajax({
+    url: $(this).attr('action'),
+    type: 'post',
+    data: $(this).serialize(),
+    dataType: 'json',
+    beforeSend: function() { $('button[form="form-payment"]').prop('disabled', true); },
+    complete: function() { $('button[form="form-payment"]').prop('disabled', false); },
+    success: function(json) {
+      $('#alert-box').html('');
+      if (json['error']) {
+        $('#alert-box').html('<div class="was-alert was-alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" onclick="this.parentNode.remove();">&times;</button></div>');
+      }
+      if (json['success']) {
+        $('#alert-box').html('<div class="was-alert was-alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" onclick="this.parentNode.remove();">&times;</button></div>');
+      }
+      window.scrollTo(0, 0);
+    },
+    error: function(xhr, ajaxOptions, thrownError) { alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText); }
+  });
+});
+</script>
+{{ footer }}
