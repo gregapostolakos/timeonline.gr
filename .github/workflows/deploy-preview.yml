@@ -1,0 +1,67 @@
+name: Deploy Preview (Dry Run)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  preview:
+    name: Preview deploy changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Dry-run rsync (preview only)
+        run: |
+          echo "=================================================="
+          echo "  DRY RUN — files that would be transferred"
+          echo "=================================================="
+          echo ""
+
+          # --checksum: compare by content (ignores timestamp diffs)
+          # --out-format='%n': output only filename of files to be transferred
+          # No verbose flag — keeps output clean
+          rsync -az --checksum --dry-run --out-format='%n' \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.claude/' \
+            --exclude='config.php' \
+            --exclude='config-dist.php' \
+            --exclude='admin/config.php' \
+            --exclude='admin/config-dist.php' \
+            --exclude='.env' \
+            --exclude='system/storage/' \
+            --exclude='image/' \
+            --exclude='docker/' \
+            --exclude='docker-compose.yml' \
+            --exclude='scripts/' \
+            --exclude='install/' \
+            --exclude='/.htaccess' \
+            --exclude='/.htaccess.txt' \
+            --exclude='.user.ini' \
+            --exclude='README.md' \
+            --exclude='catalog/view/theme/journal3/assets/*' \
+            --exclude='error_log' \
+            --exclude='.gitignore' \
+            --exclude='php.ini' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ vars.SSH_PORT || '22' }}" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/ \
+            | grep -v '/$' | grep -v '^$' > /tmp/changed_files.txt || true
+
+          COUNT=$(wc -l < /tmp/changed_files.txt | tr -d ' ')
+
+          if [ "$COUNT" = "0" ]; then
+            echo "Server is in sync — no files would be transferred."
+          else
+            echo "Files that would be transferred ($COUNT):"
+            echo ""
+            cat /tmp/changed_files.txt
+          fi

@@ -1,0 +1,98 @@
+# Config and Htaccess Files
+/.htaccess
+/config.php
+/admin/config.php
+/.vscode
+
+# Image File
+!/upload/image/no_image.jpg
+!/upload/image/
+/image/
+
+# Journal assets — keep folder tracked, ignore generated contents
+/catalog/view/theme/journal3/assets/*
+!/catalog/view/theme/journal3/assets/.gitkeep
+
+admin/view/stylesheet/bootstrap.css
+
+# System Storage Files
+#/storage/
+
+# Image Cache Files
+/image/cache/*
+!/image/cache/index.html
+
+# System Cache Files
+/storage/cache/*
+!/storage/cache/index.html
+
+# Modification Files
+/storage/modification/*
+!/storage/modification/index.html
+/system/storage/modification/*
+!/system/storage/modification/index.html
+
+# Templates Files
+/image/templates/*
+/image/templates/default.jpg
+
+# Download Files
+/storage/download/*
+!/storage/download/index.html
+
+# Session Files
+/storage/session/*
+!/storage/session/index.html
+
+# Upload Files
+/storage/upload/*
+!/storage/upload/index.html
+
+# Flags
+# remove sharp char if you want to add flags to gitignore
+# /upload/flags/*
+
+# Log Files
+/storage/logs/*
+!/storage/logs/index.html
+
+# If you want to ignore install file use following lines [on development mode]
+# /upload/backup.install/*
+# /upload/install/*
+
+# Ignore all vendor files included by composer and the lock file
+/tests/phpunit/vendor/*
+/tests/phpunit/composer.lock
+
+# Test Config File
+/tests/phpunit/bootstrap.php
+
+# IDE Project files
+/.idea
+/upload/.idea
+
+__MACOSX
+
+system/storage/cache/*
+!system/storage/cache/index.html
+!system/storage/cache/.htaccess
+system/storage/session/*
+!system/storage/session/.htaccess
+!system/storage/session/index.html
+system/storage/logs/*
+!system/storage/logs/index.html
+!system/storage/logs/.htaccess
+system/storage/download/*
+!system/storage/download/index.html
+system/storage/upload/*
+!system/storage/upload/index.html
+
+# Vendor at root — installed per-environment, never tracked
+/vendor/
+
+
+.DS_Store
+
+# Journal3 generated assets — ignore contents, keep folder tracked
+/catalog/view/theme/journal3/assets/*
+!/catalog/view/theme/journal3/assets/.gitkeep

@@ -1,0 +1,77 @@
+name: Sync from Template Repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      template_repo:
+        description: 'Template repo (org/repo)'
+        required: true
+        default: 'webartstudiogr/oc-workflow'
+        type: string
+      template_branch:
+        description: 'Branch to pull from'
+        required: true
+        default: 'main'
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    name: Update workflow files from template
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Checkout template repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.template_repo }}
+          ref: ${{ inputs.template_branch }}
+          path: _template
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Copy template files
+        run: |
+          echo "Syncing from ${{ inputs.template_repo }}@${{ inputs.template_branch }}..."
+
+          # Folders managed by template (overwrite completely)
+          rsync -a --delete _template/.github/ .github/
+          rsync -a --delete _template/scripts/ scripts/
+          rsync -a --delete _template/docker/ docker/
+          rsync -a --delete _template/.claude/ .claude/
+
+          # Single files managed by template
+          cp _template/.gitignore .gitignore
+
+          # NOT touched (per-project):
+          # - docker-compose.yml
+          # - .env
+          # - README.md
+          # - All OpenCart code (admin/, catalog/, system/, etc.)
+
+          rm -rf _template
+
+      - name: Commit changes
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+          git add .github scripts docker .claude .gitignore
+
+          if git diff --cached --quiet; then
+            echo "Already up to date with template."
+          else
+            CHANGED=$(git diff --cached --stat | tail -1)
+            git commit -m "chore: sync workflow files from template" \
+                       -m "Source: ${{ inputs.template_repo }}@${{ inputs.template_branch }}" \
+                       -m "$CHANGED"
+            git push
+            echo "Template files synced."
+          fi

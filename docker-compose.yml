@@ -1,0 +1,60 @@
+services:
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_php
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - opencart
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx
+    ports:
+      - "${NGINX_PORT:-8000}:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - opencart
+
+  db:
+    image: mariadb:10.11
+    container_name: ${COMPOSE_PROJECT_NAME}_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - opencart
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ${COMPOSE_PROJECT_NAME}_pma
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASS}
+    depends_on:
+      - db
+    networks:
+      - opencart
+
+networks:
+  opencart:
+
+volumes:
+  db_data:

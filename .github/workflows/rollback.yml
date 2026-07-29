@@ -1,0 +1,122 @@
+name: Rollback Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      commits:
+        description: 'How many commits to revert (default 1 = last commit)'
+        required: true
+        default: '1'
+        type: string
+      confirm:
+        description: 'Type "rollback" to confirm'
+        required: true
+        type: string
+
+# Prevent rollback during a deploy
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+# Allow workflow to push changes (including workflow files if reverted)
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  rollback:
+    name: Rollback to previous deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ inputs.confirm }}" != "rollback" ]; then
+            echo "Confirmation failed. You must type 'rollback' exactly."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Revert commits
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+          N="${{ inputs.commits }}"
+          echo "Reverting last $N commit(s)..."
+
+          # Show what's being reverted
+          echo ""
+          echo "Commits to be reverted:"
+          git log -n "$N" --oneline
+          echo ""
+
+          # Revert each commit individually (handles merge commits with -m 1)
+          for i in $(seq 0 $((N - 1))); do
+            COMMIT=$(git rev-parse "HEAD~${i}")
+            # Check if it's a merge commit (has 2+ parents)
+            PARENTS=$(git rev-list --parents -n 1 "$COMMIT" | wc -w)
+            if [ "$PARENTS" -gt 2 ]; then
+              echo "Reverting merge commit $COMMIT (using -m 1)..."
+              git revert --no-edit -m 1 "$COMMIT"
+            else
+              echo "Reverting commit $COMMIT..."
+              git revert --no-edit "$COMMIT"
+            fi
+          done
+
+          git push origin main
+
+      - name: Deploy reverted code via rsync
+        run: |
+          rsync -avz --checksum \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.claude/' \
+            --exclude='config.php' \
+            --exclude='admin/config.php' \
+            --exclude='.env' \
+            --exclude='system/storage/' \
+            --exclude='image/' \
+            --exclude='docker/' \
+            --exclude='docker-compose.yml' \
+            --exclude='scripts/' \
+            --exclude='install/' \
+            --exclude='/.htaccess' \
+            --exclude='.user.ini' \
+            --exclude='php.ini' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ vars.SSH_PORT || '22' }}" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/
+
+      - name: Verify site is up
+        id: smoke_test
+        run: |
+          sleep 5
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" ${{ vars.SITE_URL }})
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
+            echo "Site returns HTTP $STATUS - OK"
+          else
+            echo "Site still returns HTTP $STATUS — rollback may not have fixed it!"
+            exit 1
+          fi
+
+      - name: Notify Slack
+        if: always() && vars.SLACK_WEBHOOK
+        run: |
+          STATUS="${{ job.status }}"
+          curl -s -X POST ${{ vars.SLACK_WEBHOOK }} \
+            -H 'Content-type: application/json' \
+            -d "{\"text\": \"Rollback ${STATUS}\nSite: ${{ vars.SITE_URL }}\nReverted: ${{ inputs.commits }} commit(s)\nBy: ${{ github.actor }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>\"}"

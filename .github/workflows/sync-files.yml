@@ -1,0 +1,185 @@
+name: Sync Files from Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch to commit changes to'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+          - develop
+          - main
+      force:
+        description: 'Force sync even if conflicts detected'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    name: Sync production files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ vars.SSH_PORT || '22' }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync files from production
+        run: |
+          rsync -rltz --checksum --no-perms --no-group --no-owner --out-format='%n' \
+            --include='system/storage/cache/' \
+            --include='system/storage/cache/index.html' \
+            --include='system/storage/cache/.htaccess' \
+            --exclude='system/storage/cache/*' \
+            --include='system/storage/session/' \
+            --include='system/storage/session/index.html' \
+            --include='system/storage/session/.htaccess' \
+            --exclude='system/storage/session/*' \
+            --include='system/storage/logs/' \
+            --include='system/storage/logs/index.html' \
+            --include='system/storage/logs/.htaccess' \
+            --exclude='system/storage/logs/*' \
+            --include='system/storage/download/' \
+            --include='system/storage/download/index.html' \
+            --exclude='system/storage/download/*' \
+            --include='system/storage/upload/' \
+            --include='system/storage/upload/index.html' \
+            --exclude='system/storage/upload/*' \
+            --include='system/storage/modification/' \
+            --include='system/storage/modification/index.html' \
+            --exclude='system/storage/modification/*' \
+            --include='catalog/view/theme/journal3/assets/' \
+            --exclude='catalog/view/theme/journal3/assets/*' \
+            --include='/image/' \
+            --exclude='/image/cache/' \
+            --include='/image/*' \
+            --exclude='/image/**' \
+            --exclude='old/' \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.claude/' \
+            --exclude='docker/' \
+            --exclude='/docker-compose.yml' \
+            --exclude='/.env' \
+            --exclude='/.gitignore' \
+            --exclude='scripts/' \
+            --exclude='/config.php' \
+            --exclude='/admin/config.php' \
+            --exclude='/.htaccess' \
+            --exclude='/php.ini' \
+            --exclude='/error_log' \
+            --exclude='/.user.ini' \
+            --exclude='.well-known/' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ vars.SSH_PORT || '22' }}" \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/ ./
+
+      - name: Detect conflicts
+        id: conflicts
+        run: |
+          # Files that rsync changed (modified + untracked)
+          CHANGED_FILES=$(git status --porcelain | awk '{print $2}')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+            echo "No files changed from production."
+            exit 0
+          fi
+
+          # For each changed file, check if its last commit was a human commit (non-sync)
+          CONFLICTS=""
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then continue; fi
+
+            # Get last commit subject for this file
+            LAST_SUBJECT=$(git log -1 --format="%s" -- "$file" 2>/dev/null || echo "")
+
+            # If the file has NO previous commits (new file) → no conflict possible
+            if [ -z "$LAST_SUBJECT" ]; then continue; fi
+
+            # If last commit starts with "sync:" → safe (previous sync set it)
+            # Anything else = human-modified file being overwritten
+            if [[ ! "$LAST_SUBJECT" =~ ^sync: ]]; then
+              AUTHOR=$(git log -1 --format="%an" -- "$file")
+              DATE=$(git log -1 --format="%ad" --date=short -- "$file")
+              CONFLICTS="$CONFLICTS\n  $file"
+              CONFLICTS="$CONFLICTS\n    last: \"$LAST_SUBJECT\" ($AUTHOR, $DATE)"
+            fi
+          done <<< "$CHANGED_FILES"
+
+          if [ -n "$CONFLICTS" ]; then
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+            echo ""
+            echo "================================================="
+            echo "  CONFLICTS DETECTED"
+            echo "================================================="
+            echo "The following files have local commits that will be overwritten:"
+            echo -e "$CONFLICTS"
+            echo ""
+            echo "================================================="
+
+            if [ "${{ inputs.force }}" = "true" ]; then
+              echo "Force mode enabled — proceeding anyway."
+            else
+              echo "Sync aborted. Re-run with 'force' enabled to overwrite."
+              exit 1
+            fi
+          else
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+            echo "No conflicts detected."
+          fi
+
+      - name: Commit changes
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+          # Increase buffer for large pushes (first sync can be 100MB+)
+          git config http.postBuffer 524288000
+          git config http.maxRequestBuffer 100M
+          git config core.compression 0
+
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            CHANGED=$(git diff --cached --stat | tail -1)
+            TOTAL=$(git diff --cached --name-only | wc -l | tr -d ' ')
+
+            git commit -m "sync: pull production files ($CHANGED)" \
+                       -m "Target branch: ${{ inputs.branch }}" \
+                       -m "Total files: $TOTAL"
+
+            # Push with retry (large pushes can fail intermittently)
+            for i in 1 2 3; do
+              if git push origin ${{ inputs.branch }}; then
+                break
+              fi
+              echo "Push attempt $i failed, retrying..."
+              sleep 5
+            done
+          fi
+
+      - name: Create develop branch if missing
+        if: inputs.branch == 'develop'
+        run: |
+          if ! git ls-remote --exit-code --heads origin develop > /dev/null 2>&1; then
+            git checkout -b develop
+            git push -u origin develop
+            echo "develop branch created"
+          fi
