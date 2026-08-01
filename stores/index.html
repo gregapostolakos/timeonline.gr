@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/oc/stores/widget.css">
+<link rel="stylesheet" href="widget.css">
 <style>
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 body{background:#FCFCFA;font-family:'Jost',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
@@ -52,6 +52,18 @@ body{background:#FCFCFA;font-family:'Jost',system-ui,-apple-system,'Segoe UI',Ro
   </div>
 </div>
 </div>
-<script src="/oc/stores/widget.js" charset="UTF-8"></script>
+<script src="widget.js" charset="UTF-8"></script>
+<script>
+/* Auto-height reporter: when this page is embedded in an iframe, tell the parent our height */
+(function(){
+  if (window.parent === window) return;
+  function h(){ return Math.ceil(Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)); }
+  function post(){ try { window.parent.postMessage({ tosStoresHeight: h() }, '*'); } catch(e){} }
+  window.addEventListener('load', post);
+  window.addEventListener('resize', post);
+  if (window.ResizeObserver) { try { new ResizeObserver(post).observe(document.body); } catch(e){} }
+  setTimeout(post, 400); setTimeout(post, 1500);
+})();
+</script>
 </body>
 </html>

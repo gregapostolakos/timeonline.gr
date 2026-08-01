@@ -903,6 +903,11 @@ class ModelJournal3Filter extends Model {
 
 		$sql .= $this->addFilters($filter_data);
 
+		// Journal3 mod: optional "added within last N months" cutoff (used by product_label 'latest' preset)
+		if ($months = (int)Arr::get($filter_data, 'date_added_months')) {
+			$sql .= " AND p.date_added >= DATE_SUB(NOW(), INTERVAL " . $months . " MONTH)";
+		}
+
 		$sql .= " GROUP BY p.product_id";
 
 		$sql .= " ORDER BY ";
