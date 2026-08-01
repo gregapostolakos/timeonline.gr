@@ -257,6 +257,11 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
         $this->load->language('extension/payment/webartstudio_eurobank');
         $this->load->model('checkout/order');
 
+        // Background (server-to-server) confirmation: η Cardlink ποσταρει απευθειας,
+        // χωρις browser, με το header Modirum-VPOS. Η παραγγελια ενημερωνεται κανονικα
+        // αλλα δεν κανουμε redirect ουτε αγγιζουμε το session — δεν υπαρχει πελατης.
+        $is_background = isset($_SERVER['HTTP_MODIRUM_VPOS']);
+
         $fields = array('version', 'mid', 'orderid', 'status', 'orderAmount', 'currency',
             'paymentTotal', 'message', 'riskScore', 'payMethod', 'txId', 'paymentRef', 'digest');
 
@@ -280,6 +285,7 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
 
         if ($check_digest !== $p['digest']) {
             $this->log_debug('CALLBACK invalid digest. Expected: ' . $check_digest . ' Got: ' . $p['digest']);
+            if ($is_background) { $this->background_ok('invalid digest'); return; }
             $this->session->data['error'] = $this->language->get('error_general');
             $this->response->redirect($this->url->link('checkout/checkout', '', true));
             return;
@@ -291,6 +297,7 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
 
         if (empty($row)) {
             $this->log_debug('CALLBACK reference not found: ' . $p['orderid']);
+            if ($is_background) { $this->background_ok('reference not found: ' . $p['orderid']); return; }
             $this->session->data['error'] = $this->language->get('error_general');
             $this->response->redirect($this->url->link('checkout/checkout', '', true));
             return;
@@ -336,6 +343,9 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
                 $this->model_checkout_order->addOrderHistory($oc_order_id, $order_status_id, $comment, false, false);
             }
 
+            // Το clear_cart() και το redirect αφορουν μονο τον πελατη στον browser.
+            if ($is_background) { $this->background_ok('order ' . $oc_order_id . ' -> ' . $status); return; }
+
             if ($this->config->get($this->key . '_clear_cart')) {
                 $this->clear_cart();
             }
@@ -345,6 +355,8 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
         }
 
         // --- Αποτυχια / ακυρωση ---
+        if ($is_background) { $this->background_ok('order ' . $oc_order_id . ' -> ' . $status); return; }
+
         if ($status === 'CANCELED' || $status === 'CANCELLED') {
             $this->session->data['error'] = $this->language->get('error_canceled');
         } elseif ($status === 'REFUSED') {
@@ -372,6 +384,16 @@ class ControllerExtensionPaymentWebartstudioEurobank extends Controller {
         unset($this->session->data['voucher']);
         unset($this->session->data['vouchers']);
         unset($this->session->data['totals']);
+    }
+
+    /**
+     * Τερματισμος background κλησης. Η Cardlink περιμενει σκετο HTTP 200 —
+     * αγνοει body και redirects, οποτε δεν στελνουμε τιποτα αλλο.
+     */
+    private function background_ok($note) {
+        $this->log_debug('CALLBACK background: ' . $note);
+        $this->response->addHeader('HTTP/1.1 200 OK');
+        $this->response->setOutput('');
     }
 
     private function log_debug($message) {
