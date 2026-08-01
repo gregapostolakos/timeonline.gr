@@ -230,7 +230,7 @@ class ModelToolSeoPackageEditor extends Model {
 	 *  @param  array $columns Column information array
 	 *  @return array          Server-side processing response array
 	 */
-	public function simple ( $request, $type, $lang, $store = 0, $columns )
+	public function simple ( $request, $type, $lang, $columns, $store = 0 )
 	{
 		$bindings = array();
 		
