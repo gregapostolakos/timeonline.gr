@@ -69,9 +69,9 @@ class ControllerJournal3ProductExtras extends Controller {
 								break;
 
 							case 'latest':
-								// Journal3 mod: label all products added within the last month, no count limit
+								// Journal3 mod: label all products added within the last 2 months, no count limit
 								$filter_data['ignore_stock'] = true;
-								$filter_data['date_added_months'] = 1;
+								$filter_data['date_added_months'] = 2;
 								$filter_data['limit'] = 0;
 								$results = $this->model_journal3_filter->getProducts($filter_data);
 								break;
