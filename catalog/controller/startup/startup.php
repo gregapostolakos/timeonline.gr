@@ -73,40 +73,14 @@ class ControllerStartupStartup extends Controller {
 			$code = $this->request->cookie['language'];
 		}
 		
-		// Language Detection
-		if (!empty($this->request->server['HTTP_ACCEPT_LANGUAGE']) && !array_key_exists($code, $languages)) {
-			$detect = '';
-			
-			$browser_languages = explode(',', $this->request->server['HTTP_ACCEPT_LANGUAGE']);
-			
-			// Try using local to detect the language
-			foreach ($browser_languages as $browser_language) {
-				foreach ($languages as $key => $value) {
-					if ($value['status']) {
-						$locale = explode(',', $value['locale']);
-						
-						if (in_array($browser_language, $locale)) {
-							$detect = $key;
-							break 2;
-						}
-					}
-				}	
-			}			
-			
-			if (!$detect) { 
-				// Try using language folder to detect the language
-				foreach ($browser_languages as $browser_language) {
-					if (array_key_exists(strtolower($browser_language), $languages)) {
-						$detect = strtolower($browser_language);
-						
-						break;
-					}
-				}
-			}
-			
-			$code = $detect ? $detect : '';
-		}
-		
+		// Language Detection — ΑΠΕΝΕΡΓΟΠΟΙΗΜΕΝΗ.
+		// Η προεπιλογή της OpenCart διαβάζει το HTTP_ACCEPT_LANGUAGE, οπότε ένας
+		// επισκέπτης με μη-ελληνικό browser προσγειωνόταν στα αγγλικά. Το κατάστημα
+		// πρέπει να ανοίγει ΠΑΝΤΑ στα ελληνικά. Η σειρά μένει:
+		//   session -> cookie -> config_language (el-gr)
+		// Ο επιλογέας γλώσσας συνεχίζει να δουλεύει κανονικά, γιατί γράφει
+		// session + cookie, που έχουν προτεραιότητα παρακάτω.
+
 		if (!array_key_exists($code, $languages)) {
 			$code = $this->config->get('config_language');
 		}
